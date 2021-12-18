@@ -29,10 +29,11 @@ class HardwareController():
 	self.parameters_as.start()
 	self.reset_as = actionlib.SimpleActionServer("reset_hardware", StageAction, self.reset_callback, False) 
 	self.reset_as.start()
-        # TEMPORARY SOLUTION (should be replaced with data_collection action server)
-        # publisher that eavesdrops on data collection action server result topics and publishes to a topic
-        # that gets recorded in a rosbag.
-	# Include if you want to publish data from the apparatus: 
+	
+#         TEMPORARY SOLUTION (should be replaced with data_collection action server)
+#         publisher that eavesdrops on data collection action server result topics and publishes to a topic
+#         that gets recorded in a rosbag.
+# 	  Include if you want to publish data from the apparatus: 
 	
 #         self.stop_sleep_sub = rospy.Subscriber("start_data_collection/goal", StageActionGoal, self.stop_sleep_callback)
 #         self.start_sub = rospy.Subscriber("start_data_collection/result", StageActionResult, self.start_data_callback)
@@ -41,20 +42,19 @@ class HardwareController():
 #         self.rate = rospy.Rate(35)
 #         self.collect_data = False
 #         self.is_set = False
-        
-        while not rospy.is_shutdown():
-            if(self.collect_data):
-                #collect data
-                data_message = DoorSensors()
-                #format message here
-                self.data_pub.publish(data_message)
-                self.rate.sleep()
-                self.is_set = False
-            else:
-                if(not self.is_set):
-                    sleep(2)
-        #runs after ros is closed
-        gpio.cleanup()
+#         while not rospy.is_shutdown():
+#             if(self.collect_data):
+#                 #collect data
+#                 data_message = DoorSensors()
+#                 #format message here
+#                 self.data_pub.publish(data_message)
+#                 self.rate.sleep()
+#                 self.is_set = False
+#             else:
+#                 if(not self.is_set):
+#                     sleep(2)
+#         #runs after ros is closed
+#         gpio.cleanup()
 
     def parameter_callback(self, goal):
         # goal.parameters includes trial parameters for the apparatus
@@ -87,3 +87,4 @@ if __name__ == "__main__":
     app = ApparatusClass()
     rospy.init_node("template_controller", argv=sys.argv)
     initialize = HardwareController(app)
+    rospy.spin() # remove if using code that publishes data
