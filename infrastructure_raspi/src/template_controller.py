@@ -87,5 +87,5 @@ class HardwareController():
 if __name__ == "__main__":
     #initialize hardware
     app = ApparatusClass()
-    rospy.init_node("hardware_controller", argv=sys.argv)
+    rospy.init_node("template_controller", argv=sys.argv)
     initialize = HardwareController(app)
