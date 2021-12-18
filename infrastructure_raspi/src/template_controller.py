@@ -3,8 +3,6 @@
 
 # Template for a controller node
 #
-# door_controller.py
-#
 # Author: Ryan Roberts
 #
 # A node that handles all of the Action servers and topics for an apparatus
