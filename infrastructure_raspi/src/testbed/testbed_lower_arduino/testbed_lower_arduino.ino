@@ -13,7 +13,7 @@ bool counting = false;
 bool swap = true;
 
 const int hall_effect_pin = 10;
-const int cone_button_pin = 7;
+const int cone_button_pin = 6;
 const int limit_switch_pin = 11;
 const int encoder_pin = 3;
 bool varl = 0;
@@ -27,7 +27,6 @@ void setup() {
   pinMode(encoder_pin, INPUT);
   pinMode(cone_button_pin, INPUT);
   pinMode(hall_effect_pin, INPUT);
-  
   Wire.begin(I2C_SLAVE);
   Wire.setClock( 100000L);
   Wire.onRequest(requestEvents);
@@ -45,6 +44,7 @@ void loop() {
   varh = digitalRead(hall_effect_pin);
   stepbytes[0]=lowByte(current_steps);
   stepbytes[1]= highByte(current_steps);
+  //Serial.println("ls: " + String(varl) + " -- he: " + String(varh) + " --- cb: " + String(varb));
   
   if (counting == false){
       current_steps = 0;
@@ -58,7 +58,7 @@ void step_counter(){
 }
 /*********************************************************************************/
 void requestEvents(){
-  Serial.println("Requested an event");
+  //Serial.println("Requested an event");
   switch(initial_received){
     case 2:
       counting=true;

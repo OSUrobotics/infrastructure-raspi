@@ -1,9 +1,17 @@
 <launch>
+
+<arg name="apparatus" default="drawer"/>
+
 <!--
-Include controller node for your apparatus here
-
-Example:
-<node pkg="infrastructure_raspi" name=<apparatus_name> type=<hardware_controller_name> output="screen"/>
-
+<node pkg="infrastructure_raspi" name="reset" type="reset.py" output="screen"/>
+<node pkg="infrastructure_raspi" name="test_parameters" type="test_parameters.py" output="screen"/>
+<node pkg="infrastructure_raspi" name="data_hardware" type="data_hardware.py" output="screen"/>
 -->
+
+<node pkg="infrastructure_raspi" name="drawer_controller" type="drawer_controller.py" output="screen" if="$(eval arg('apparatus') == 'drawer')"/>
+
+<node pkg="infrastructure_raspi" name="door_controller" type="door_controller.py" output="screen" if="$(eval arg('apparatus') == 'door')"/>
+
+<node pkg="infrastructure_raspi" name="testbed_controller" type="testbed_controller.py" output="screen" if="$(eval arg('apparatus') == 'testbed')"/>
+
 </launch>
