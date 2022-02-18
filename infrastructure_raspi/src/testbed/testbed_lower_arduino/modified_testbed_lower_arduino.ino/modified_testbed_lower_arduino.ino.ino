@@ -1,7 +1,7 @@
 #include <Wire.h>
 #define SLAVE 15 // 0x0f
 #define hall_effect_pin 10
-#define cone_button_pin 6
+#define cone_button_pin 5
 #define limit_switch_pin 11
 #define encoder_pin 3
 
