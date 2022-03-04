@@ -22,7 +22,7 @@ __Note:__ depending on how the controller node is set up for the apparatus, it m
 ### Subscribers:
 - __stop_sleep_sub__
   - Listens to the _/start_data_collection/goal_ topic to know when to stop sleeping and start checking for whether or not it should start collecting and publishing the data from the Door.
-  - Used to prevent the node from taking up too much time on the schedular.
+  - Used to prevent the node from taking up too much time on the schedular (yes, this was an actual problem).
 - __start_sub__
   - Listens to the _/start_data_collection/result_ topic to know when to start collecting and publishing the data from the Door.
 - __stop_sub__
