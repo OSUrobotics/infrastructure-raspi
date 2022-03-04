@@ -1,4 +1,4 @@
-# infrastructure-raspi
+# infrastructure-raspi Template
 ## Overview
 Contains branches for each apparatus that includes the hardware source code, a ROS node for controlling the apparatus within the infrastructure system, and urdf models for visualizing the apparatus (if applicable). 
 
@@ -10,8 +10,11 @@ __Note:__ depending on how the controller node is set up for the apparatus, it m
 
 ### Action Servers:
 - __set_test_parameters__
-  - Action server that the _User Arm Control_ stage action client sends a goal to.
-  - Used to signal start of arm control. Sends result once arm control has finished
+  - Action server that the _Set Test Parameters_ parameter action client sends a goal to.
+  - Used to signal start of a trial. Runs any hardware code necessary for getting the apparatus ready for a trial. Sends result when hardware code has either finished executing or failed.
+- __reset_hardware__
+  - Action server that the _Reset_ stage action client sends a goal to.
+  - Used to signal end of a trial. Runs any hardware code necessary for resetting the apparatus after a trial. Sends result when hardware code has either finished executing or failed.
 ### Services:
 - None
 ### Publishers:
