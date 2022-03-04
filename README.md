@@ -1,8 +1,10 @@
 # infrastructure-raspi
 ## Overview
-Template of how to set up a branch for an apparatus.
+Contains branches for each apparatus that includes the hardware source code, a ROS node for controlling the apparatus within the infrastructure system, and urdf models for visualizing the apparatus (if applicable). 
 
-## arm_control Package Interface
+The _main_ branch contains a template of how to set up a branch for an apparatus. The [apparatus]() folder should contain all of the hardware source code. 
+
+## infrastructure_raspi Package Interface
 ### Action Servers:
 - __start_arm_sequence__
   - Action server that the _User Arm Control_ stage action client sends a goal to.
