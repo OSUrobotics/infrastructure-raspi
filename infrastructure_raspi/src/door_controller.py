@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-
 # Main controller node
 #
 # door_controller.py
 #
 # Author: Ryan Roberts
 #
-# A node that handles all of the Action servers and topics for the Door
+# Node that handles all of the Action servers and topics for the Door
 
 import rospy
 import sys
@@ -74,7 +73,7 @@ class HardwareController():
         gpio.cleanup()
 
     def parameter_callback(self, goal):
-        friction_setting = goal.parameters[0] * 100 #hack to get parameter to 100
+        friction_setting = goal.parameters[0]
         try:
             self.parameters_as.publish_feedback(TestParametersFeedback(status="setting friction to: {} N".format(friction_setting)))
             self.hardware.start_new_trial(friction_setting)
