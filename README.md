@@ -2,7 +2,7 @@
 ## Overview
 Contains branches for each apparatus that includes the hardware source code, a ROS node for controlling the apparatus within the infrastructure system, and urdf models for visualizing the apparatus (if applicable). 
 
-The _main_ branch contains a template of how to set up a branch for an apparatus. The [apparatus]() folder should contain all of the hardware source code. 
+The _main_ branch contains a template of how to set up a branch for an apparatus (see [_template_controller.py_](https://github.com/OSUrobotics/infrastructure-raspi/blob/main/infrastructure_raspi/src/template_controller.py)). The [apparatus](https://github.com/OSUrobotics/infrastructure-raspi/tree/main/infrastructure_raspi/src/apparatus) folder should contain all of the hardware source code.
 
 ## infrastructure_raspi Package Interface
 ### Action Servers:
