@@ -1,8 +1,8 @@
 # infrastructure-raspi Door
 ## Overview
-Contains hardware source code for the Door, a ROS node for controlling the Door within the infrastructure system, and urdf models for visualizing the Door (TODO). 
+Contains hardware source code for the Door, a ROS node for controlling the Door within the infrastructure system, and urdf models for visualizing the Door (need to still include urdf files). 
 
-The [door_controller](https://github.com/OSUrobotics/infrastructure-raspi/blob/door/infrastructure_raspi/src/door_controller.py) node not only controlls the hardware for the Door, but also publishes the data to the _/hardware_infsensor_ topic as well as record the data in a csv file that's stored in a shared folder (_rem_home/_) between the PI and host machine (TODO last one).
+The [door_controller](https://github.com/OSUrobotics/infrastructure-raspi/blob/door/infrastructure_raspi/src/door_controller.py) node not only controlls the hardware for the Door, but also publishes the data to the _/hardware_infsensor_ topic.
 ## infrastructure_raspi Package Interface
 
 __Note:__ depending on how the controller node is set up for the apparatus, it may have additional publishers/subscribers. Be sure to look at the README.md in the specific apparatus branch.
