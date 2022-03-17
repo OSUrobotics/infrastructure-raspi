@@ -1,6 +1,6 @@
 # infrastructure-raspi Drawer
 ## Overview
-Contains hardware source code for the Drawer, a ROS node for controlling the Drawer within the infrastructure system, and urdf models for visualizing the Drawer. 
+Contains hardware source code for the Drawer, a ROS node for controlling the Drawer within the infrastructure system, and urdf as well as stl files for visualizing the Drawer. 
 
 The [drawer_controller](https://github.com/OSUrobotics/infrastructure-raspi/blob/drawer/infrastructure_raspi/src/drawer_controller.py) node not only controlls the hardware for the Drawer, but also publishes the data to the _/hardware_infsensor_ topic as well as record the data in a csv file that's stored in a shared folder (_rem_home/_) between the PI and host machine.
 ## infrastructure_raspi Package Interface
