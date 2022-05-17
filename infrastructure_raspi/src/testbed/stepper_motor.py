@@ -145,7 +145,7 @@ class StepperMotor:
         gpio.output(self.pulse_pin, gpio.LOW)
         sleep(speed)
         self.__current_steps += inc
-      gpio.output(self.en_pin, gpio.LOW)
+      #gpio.output(self.en_pin, gpio.LOW)
     except ValueError:
       print("Invalid speed value")
       return

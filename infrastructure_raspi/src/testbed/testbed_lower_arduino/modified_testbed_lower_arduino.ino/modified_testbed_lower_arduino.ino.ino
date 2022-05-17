@@ -70,6 +70,8 @@ void stepCounter(){
 }
 
 void requestEventHandler(){
+  Serial.println("requestEventHandler")
+
   switch(received){
     case 3:
       data[0] = 0;
@@ -97,6 +99,8 @@ void requestEventHandler(){
 }
 
 void receiveEventHandler(int num_bytes){
+  Serial.println("receiveEventHandler")
+
   received = Wire.read();
   if(received == 6){
     counting = true;  
