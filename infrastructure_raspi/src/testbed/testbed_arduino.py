@@ -2,7 +2,7 @@
 
 from time import time, sleep
 import RPi.GPIO as gpio
-from stepper_motor import StepperMotor
+from StepperMotor.stepper_motor import StepperMotor
 from lower_i2c_controller import lowerController
 import smbus2 as smbus
 
@@ -151,16 +151,27 @@ class Testbed():
         lift_time = 0
         self.lower_slave.limit_switch_mode()
         sleep(0.1)
+        self.reset_cone_motor.run_motor(self.reset_cone_motor.CCW)
         while True:
             button = self.lower_slave.get_data()
             if lift_time >= self.lift_time_limit or button == 1:
-                if button == 1:  
+                self.reset_cone_motor.stop_motor()
+                if button == 1:
                     print("button was pressed")
                 else:
                     print("time ran out")
                 break
-            self.reset_cone_motor.move_for(0.01, self.reset_cone_motor.CCW)
             lift_time = time() - start_time
+        # while True:
+        #     button = self.lower_slave.get_data()
+        #     if lift_time >= self.lift_time_limit or button == 1:
+        #         if button == 1:  
+        #             print("button was pressed")
+        #         else:
+        #             print("time ran out")
+        #         break
+        #     self.reset_cone_motor.move_for(0.01, self.reset_cone_motor.CCW)
+        #     lift_time = time() - start_time
     #----------------------------------------------------------------------------------------------------------------------------#    
     def cone_reset_down(self, time_duration=None):
         print("cone down")
