@@ -157,17 +157,13 @@ class Testbed():
         while True:
             button = self.lower_slave.get_data()
             if lift_time >= self.lift_time_limit or button == 1:
-<<<<<<< HEAD
                 self.reset_cone_motor.stop_motor()
-=======
->>>>>>> e2120e3d67d59f245244cfce4702ade67e70fc1f
                 if button == 1:
                     print("button was pressed")
                 else:
                     print("time ran out")
                 break
             lift_time = time() - start_time
-<<<<<<< HEAD
         # while True:
         #     button = self.lower_slave.get_data()
         #     if lift_time >= self.lift_time_limit or button == 1:
@@ -179,10 +175,9 @@ class Testbed():
         #     self.reset_cone_motor.move_for(0.01, self.reset_cone_motor.CCW)
         #     lift_time = time() - start_time
     #----------------------------------------------------------------------------------------------------------------------------#    
-=======
+
     #----------------------------------------------------------------------------------------------------------------------------#
 
->>>>>>> e2120e3d67d59f245244cfce4702ade67e70fc1f
     def cone_reset_down(self, time_duration=None):
         print("cone down")
         if time_duration == None:
