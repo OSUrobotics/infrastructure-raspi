@@ -153,7 +153,7 @@ class Testbed():
         lift_time = 0
         self.lower_slave.limit_switch_mode()
         sleep(0.1)
-        self.reset_cone_motor.run_motor(self.reset_cone_motor.CW)
+        self.reset_cone_motor.start_motor(self.reset_cone_motor.CW)
         while True:
             button = self.lower_slave.get_data()
             if lift_time >= self.lift_time_limit or button == 1:
