@@ -153,7 +153,7 @@ class Testbed():
         lift_time = 0
         self.lower_slave.limit_switch_mode()
         sleep(0.1)
-        self.reset_cone_motor.run_motor(self.reset_cone_motor.CCW)
+        self.reset_cone_motor.run_motor(self.reset_cone_motor.CW)
         while True:
             button = self.lower_slave.get_data()
             if lift_time >= self.lift_time_limit or button == 1:
@@ -164,31 +164,15 @@ class Testbed():
                     print("time ran out")
                 break
             lift_time = time() - start_time
-        # while True:
-        #     button = self.lower_slave.get_data()
-        #     if lift_time >= self.lift_time_limit or button == 1:
-        #         if button == 1:  
-        #             print("button was pressed")
-        #         else:
-        #             print("time ran out")
-        #         break
-        #     self.reset_cone_motor.move_for(0.01, self.reset_cone_motor.CCW)
-        #     lift_time = time() - start_time
+    
     #----------------------------------------------------------------------------------------------------------------------------#    
-
-    #----------------------------------------------------------------------------------------------------------------------------#
 
     def cone_reset_down(self, time_duration=None):
         print("cone down")
         if time_duration == None:
             time_duration = self.lower_time_limit
-        start_time = time()
-        lower_time = 0
-        while True:
-            if lower_time >= time_duration:
-                break
-            self.reset_cone_motor.move_for(0.01, self.reset_cone_motor.CW)
-            lower_time = time() - start_time
+        self.reset_cone_motor.move_for(time_duration, self.reset_cone_motor.CCW)
+    
     #----------------------------------------------------------------------------------------------------------------------------#
 
     def cable_reset_spool_in(self):
@@ -273,6 +257,7 @@ class Testbed():
         print("Angle recorded after motors stopped running: {}".format(
             self.lower_slave.get_data()))
         self.lower_slave.stop_counting()
+    
     #----------------------------------------------------------------------------------------------------------------------------#
     # # not being used but can be useful tool in future
     # def lower_arduino_reset(self):
