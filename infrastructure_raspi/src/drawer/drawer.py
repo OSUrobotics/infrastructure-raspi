@@ -4,7 +4,7 @@ from time import time
 import spidev
 import RPi.GPIO as gpio
 import VL53L0X
-from stepper_motor import StepperMotor
+from StepperMotor.stepper_motor import StepperMotor
 from drawer_data import DataPoint
 
 # Author: Ryan Roberts
