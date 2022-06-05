@@ -160,7 +160,7 @@ class StepperMotor:
         exit()
     else:
         # parent process, wait for child process to finish
-        return_status = os.waitpid(self.__child_pid, None)
+        return_status = os.waitpid(self.__child_pid, 0)
         if not os.WIFEXITED(return_status):
           raise Exception("Failed to step motor for entire amount. Stop Signal: {}".format(os.WSTOPSIG(return_status))) 
 
