@@ -51,10 +51,10 @@ class Drawer:
   
   def __set_friction(self):
     self.fric_motor.step(self.__resistance_steps, self.fric_motor.CW)
-    gpio.output(self.fric_en, gpio.HIGH) #keep motor resistance on
+    self.fric_motor.override_enable() #keep motor resistance on
   
   def __reset_friction(self):
-    self.fric_motor.step_to(0)
+    self.fric_motor.step(self.__resistance_steps, self.fric_motor.CCW)
     
   def __read_handle(self):
     data = [-1] * 14
