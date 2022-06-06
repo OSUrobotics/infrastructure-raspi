@@ -98,6 +98,8 @@ class StepperMotor:
     """
     Blocking. Moves motor in a single direction for a given time.
     
+    Do not need to call stop_motor() after running this method.
+
     Note: Number of steps made by motor may vary using this method.
           Do not use for precise movements.
     
@@ -123,7 +125,9 @@ class StepperMotor:
   
   def step(self, num_steps, direction, speed = None):
     """
-    Blocking. Steps motor in a single direction for a given amount of steps
+    Blocking. Steps motor in a single direction for a given amount of steps.
+
+    Do not need to call stop_motor() after running this method.
     
     Parameters
     ----------
@@ -160,9 +164,12 @@ class StepperMotor:
         exit()
     else:
         # parent process, wait for child process to finish
-        return_status = os.waitpid(self.__child_pid)
-        if not os.WIFEXITED(return_status):
-          raise Exception("Failed to step motor for entire amount. Stop Signal: {}".format(os.WSTOPSIG(return_status))) 
+        return_status = os.waitpid(self.__child_pid, 0)
+        if not os.WIFEXITED(return_status[1]):
+          raise Exception("Failed to step motor for entire amount. Stop Signal: {}".format(os.WSTOPSIG(return_status)))
+        # put motor in stopped state
+        self.__child_pid = -5
+        gpio.output(self.en_pin, gpio.LOW)
 
   def override_enable(self):
     """
