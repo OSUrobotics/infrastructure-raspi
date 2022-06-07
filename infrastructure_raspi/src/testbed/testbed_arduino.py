@@ -5,7 +5,7 @@ import RPi.GPIO as gpio
 from stepper_motor import StepperMotor
 from lower_i2c_controller import lowerController
 import smbus2 as smbus
-
+import struct
 
 class Testbed():
 
@@ -22,7 +22,7 @@ class Testbed():
         self.reset_cone_en = 12  # pin  (HIGH to Enable / LOW to Disable)
         self.reset_cone_speed = 0.00001  # default value
 
-        self.lift_time_limit = 6.0  # seconds
+        self.lift_time_limit = 10.0  # seconds
         self.lower_time_limit = 2.0  # seconds
         self.goal_angle = 0
         self.angle_error = 1
@@ -154,14 +154,14 @@ class Testbed():
         self.lower_slave.limit_switch_mode()
         sleep(0.1)
         while True:
-            button = self.lower_slave.get_data()
+            button = self.lower_slave.get_data(3)
             if lift_time >= self.lift_time_limit or button == 1:
                 if button == 1:
                     print("button was pressed")
                 else:
                     print("time ran out")
                 break
-            self.reset_cone_motor.move_for(0.01, self.reset_cone_motor.CCW)
+            self.reset_cone_motor.move_for(0.01, self.reset_cone_motor.CW)
             lift_time = time() - start_time
     #----------------------------------------------------------------------------------------------------------------------------#
 
@@ -174,7 +174,7 @@ class Testbed():
         while True:
             if lower_time >= time_duration:
                 break
-            self.reset_cone_motor.move_for(0.01, self.reset_cone_motor.CW)
+            self.reset_cone_motor.move_for(0.01, self.reset_cone_motor.CCW)
             lower_time = time() - start_time
     #----------------------------------------------------------------------------------------------------------------------------#
 
@@ -190,7 +190,7 @@ class Testbed():
         spool_in_time = 0
         while True:
             sleep(.01)
-            button_val = self.lower_slave.get_data()
+            button_val = self.lower_slave.get_data(4)
             if spool_in_time >= self.spool_in_time_limit or button_val == 1:
                 if button_val == 1:
                     print("button was pressed")
@@ -222,7 +222,7 @@ class Testbed():
         print("resetting home")
         self.lower_slave.hall_effect_mode()
         sleep(0.1)
-        hall_effect = self.lower_slave.get_data()
+        hall_effect = self.lower_slave.get_data(5)
         if hall_effect == 0:
             # already within HE range. To ensure rotation ends at beginning of range, turn for set degrees > range
             print("Already within Home range, moving to guarantee front of range")
@@ -232,24 +232,33 @@ class Testbed():
 
         gpio.output(self.turntable_motor_in1, gpio.LOW)
         gpio.output(self.turntable_motor_in2, gpio.HIGH)
+        # TODO: temporariliy commented this out
         while True:
             # turn until find HE (guaranteed to be at beginning of range)
-            hall_effect = self.lower_slave.get_data()
+            hall_effect = self.lower_slave.get_data(5)
+            # print("hall_effect: ", hall_effect)
             if hall_effect == 0:
                 gpio.output(self.turntable_motor_in1, gpio.LOW)
                 gpio.output(self.turntable_motor_in2, gpio.LOW)
                 print("magnet detected")
                 break
-            sleep(0.01)
+        sleep(1)
     #----------------------------------------------------------------------------------------------------------------------------#
 
     def turntable_move_angle(self, goal_angle=20):
         print("moving to angle")
         gpio.output(self.turntable_motor_in1, gpio.LOW)
         gpio.output(self.turntable_motor_in2, gpio.HIGH)
+        self.lower_slave.stop_counting()    # send this first so that count is for sure reset to 0
         self.lower_slave.start_counting()
+
+        encoder_value = self.lower_slave.get_data(6)
+        print("first encoder_value: ", encoder_value)
+        
+        # TODO: temporariliy commented this out
         while True:
-            encoder_value = self.lower_slave.get_data()
+            print("----------")
+            encoder_value = self.lower_slave.get_data(6)
             print("encoder_value: ", encoder_value)
             if encoder_value >= goal_angle:
                 gpio.output(self.turntable_motor_in1, gpio.LOW)
@@ -258,7 +267,7 @@ class Testbed():
                 break
         sleep(1)  # make sure motors are fully stopped
         print("Angle recorded after motors stopped running: {}".format(
-            self.lower_slave.get_data()))
+            self.lower_slave.get_data(6)))
         self.lower_slave.stop_counting()
     #----------------------------------------------------------------------------------------------------------------------------#
     # # not being used but can be useful tool in future
@@ -292,27 +301,26 @@ class Testbed():
         secondObjectHeight = 2201
         secondObjectPos = 1  # pickup for second object
 
-        # firstObjectHeightBytes = firstObjectHeight.to_bytes(
-        #     4, byteorder='little')
-        # secondObjectHeightBytes = secondObjectHeight.to_bytes(
-        #     4, byteorder='little')
+        firstObjectHeightBytes = list(bytearray(struct.pack('<L', firstObjectHeight)))
+        secondObjectHeightBytes = list(bytearray(struct.pack('<L', secondObjectHeight)))
 
         # temporarily comment out for testing without I2C device
-        # self.I2Cbus.write_i2c_block_data(self.I2C_SLAVE2_ADDRESS, 0x00, [
-        #     0xaa,
-        #     firstObjectHeightBytes[0], firstObjectHeightBytes[1], firstObjectHeightBytes[2], firstObjectHeightBytes[3],
-        #     firstObjectPos,
-        #     secondObjectHeightBytes[0], secondObjectHeightBytes[1], secondObjectHeightBytes[2], secondObjectHeightBytes[3],
-        #     secondObjectPos,
-        #     0xff
-        # ])
+        self.I2Cbus.write_i2c_block_data(self.I2C_SLAVE2_ADDRESS, 0x00, [
+            0xaa,
+            firstObjectHeightBytes[0], firstObjectHeightBytes[1], firstObjectHeightBytes[2], firstObjectHeightBytes[3],
+            firstObjectPos,
+            secondObjectHeightBytes[0], secondObjectHeightBytes[1], secondObjectHeightBytes[2], secondObjectHeightBytes[3],
+            secondObjectPos,
+            0xff
+        ])
 
-        # TODO: wait for arduino to respond with finished
-        # msg = smbus.i2c_msg.read(self.__addr, 2)
-        # self.__I2c_bus.i2c_rdwr(msg)
-        # raw_list = list(msg)
-        # val = (raw_list[0] << 8) + raw_list[1]
-        # print(val)
+        # wait for arduino to respond with finished status 0xF0
+        while True:
+            sleep(1)
+            msg = self.I2Cbus.read_byte_data(self.I2C_SLAVE2_ADDRESS, 0)
+            print("Data:", hex(msg))
+            if(msg == 0xF0):
+                break
 
         print("Sending Lower Reset Code")
         self.cone_reset_up()
@@ -336,6 +344,8 @@ class Testbed():
         self.cone_reset_down()
         self.cable_reset_spool_out(self.spool_out_time_limit)
         self.turntable_reset_home()
+
+        print("Finished Sending Lower Reset Code")
 #----------------------------------------------------------------------------------------------------------------------------#
 
     def action_caller(self, object_index, goal_angle):

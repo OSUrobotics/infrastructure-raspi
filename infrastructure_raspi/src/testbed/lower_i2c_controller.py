@@ -33,9 +33,13 @@ class lowerController():
             none
         """
         sleep(0.01)
-        self.__I2c_bus.write_byte(self.__addr, val)
+        try:
+            self.__I2c_bus.write_byte(self.__addr, val)
+        except:
+            sleep(0.01)
+            # print("i2c write error") # sometimes the write_byte fails, so catch it instead of crashing program
     
-    def get_data(self):
+    def get_data(self, val):
         """
         sends i2c read message  to device at specified address.
         requests to read 2 data frames.
@@ -46,14 +50,25 @@ class lowerController():
         Returns:
             integer value of data received from message
         """
-        sleep(0.01)
+        # sleep(.01)
+        # commented out this sleep since it was interfering with cone stepper speed
+
         # using i2c_msg object to use it's rdwr command to be able to read multiple data frames. 
         # smbus2 read block commands do not work without specifying a register, which we can't do here.
-        msg = smbus.i2c_msg.read(self.__addr, 2) 
-        self.__I2c_bus.i2c_rdwr(msg)
-        raw_list = list(msg)
-        val = (raw_list[0] << 8) + raw_list[1]
-        return val
+        # msg = smbus.i2c_msg.read(self.__addr, 2) 
+        # self.__I2c_bus.i2c_rdwr(msg)
+        # raw_list = list(msg)
+        # val = (raw_list[0] << 8) + raw_list[1]
+        
+        try:
+            msg = self.__I2c_bus.read_byte_data(self.__addr, val)
+            # print("Data:", hex(msg))
+            return msg
+        except:
+            sleep(0.01)
+            # print("i2c read error") # sometimes the read_byte_data fails, so catch it instead of crashing program
+
+        return -1
     
     def limit_switch_mode(self):
         """

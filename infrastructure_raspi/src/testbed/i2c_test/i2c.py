@@ -60,7 +60,7 @@ def main(args):
         ])
     return 0
 if __name__ == '__main__':
-     try:
+    try:
         main(sys.argv)
-     except KeyboardInterrupt:
+    except KeyboardInterrupt:
         print("program was stopped manually")
