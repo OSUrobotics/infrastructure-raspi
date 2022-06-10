@@ -123,7 +123,6 @@ class HardwareController():
         self.is_set = True
 
     def start_data_callback(self, msg):
-        self.trial_count += 1
         self.collect_data = True
 
     def stop_data_callback(self, msg):
