@@ -57,6 +57,10 @@ class StepperMotor:
   CCW = 1
   CW = 0
 
+  # setting a signal handler for current process for SIGUSR2 signal
+  def __handle_SIGUSR2(self, sig, frame):
+    os._exit(os.EX_OK)
+
   def __init__(self, pulse_pin, dir_pin, en_pin, default_speed = None):
     """
     Constructor
@@ -92,6 +96,7 @@ class StepperMotor:
 
     # child PID retrieved from fork().
     # When no child process is running, value is -5
+    signal.signal(signal.SIGUSR2, self.__handle_SIGUSR2)
     self.__child_pid = -5
   
   def move_for(self, run_time, direction, speed = None):
@@ -228,11 +233,10 @@ class StepperMotor:
     -------
     None
     """
-    # kills motor process using SIGTERM UNIX signal.
-    # use ps to see if child exited
+    # kills motor process using custom signal SIGUSR2 UNIX signal.
     if not self.is_running():
       raise Exception("No motor to kill")
-    os.kill(self.__child_pid, signal.SIGTERM)
+    os.kill(self.__child_pid, signal.SIGUSR2)
     self.__child_pid = -5
     gpio.output(self.en_pin, gpio.LOW)
 
