@@ -161,7 +161,7 @@ class StepperMotor:
           sleep(speed)
           gpio.output(self.pulse_pin, gpio.LOW)
           sleep(speed)
-        exit()
+        os._exit(os.EX_OK)
     else:
         # parent process, wait for child process to finish
         return_status = os.waitpid(self.__child_pid, 0)
