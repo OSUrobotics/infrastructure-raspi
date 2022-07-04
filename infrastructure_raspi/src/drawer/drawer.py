@@ -24,7 +24,7 @@ class Drawer:
     self.spi_upper.max_speed_hz = 1000000
 
     self.reset_pul = 5 #pin 29
-    self.reset_dir = 6 # pin 31 
+    self.reset_dir = 6 # pin 31
     self.reset_en = 13  # pin 33, (High to Enable / LOW to Disable)
     self.time_unwind = 2 #in seconds
     self.reset_speed = .000001 # seconds
@@ -50,11 +50,11 @@ class Drawer:
     self.__trial_data = []
   
   def __set_friction(self):
-    self.fric_motor.step(self.__resistance_steps, self.fric_motor.CW)
+    self.fric_motor.step(self.__resistance_steps, self.fric_motor.CCW)
     self.fric_motor.override_enable() #keep motor resistance on
   
   def __reset_friction(self):
-    self.fric_motor.step(self.__resistance_steps, self.fric_motor.CCW)
+    self.fric_motor.step(self.__resistance_steps, self.fric_motor.CW)
     
   def __read_handle(self):
     data = [-1] * 14
@@ -75,7 +75,7 @@ class Drawer:
     self.tof.start_ranging(self.tof_mode)
     self.start_pos = self.tof.get_distance()
     self.__set_friction()
-    self.__trial_data = [] #not need?
+    # self.__trial_data = [] #not need?
   
   def collect_data(self):
     data_point = DataPoint(self.tof.get_distance() - self.start_pos, self.__read_handle())
@@ -83,15 +83,18 @@ class Drawer:
   
   def reset(self):
     self.__reset_friction()
-    did_move = False
     end_pos = self.start_pos + self.dis_buffer
+    if(self.tof.get_distance() <= end_pos):
+      # drawer didn't move, don't unwind
+      self.tof.stop_ranging()
+      return
+    self.reset_motor.start_motor(self.reset_motor.CCW)
     while (True):
-      if(self.tof.get_distance() <= end_pos):
+      if self.tof.get_distance() <= end_pos:
         break
-      did_move = True
-      self.reset_motor.move_for(0.1, self.reset_motor.CCW)
-    if(did_move):
-      self.reset_motor.move_for(self.time_unwind, self.reset_motor.CW)
+      # self.reset_motor.move_for(0.1, self.reset_motor.CCW)
+    self.reset_motor.stop_motor()
+    self.reset_motor.move_for(self.time_unwind, self.reset_motor.CW)
     self.tof.stop_ranging()
     
   def get_trial_data(self):
