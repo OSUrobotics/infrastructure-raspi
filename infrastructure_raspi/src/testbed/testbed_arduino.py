@@ -39,8 +39,8 @@ class Testbed():
         self.reset_cable_en = 5
         self.reset_cable_speed = 0.00001  # default value
 
-        self.spool_out_time_limit = 4.5  # seconds
-        self.spool_in_time_limit = 12  # seconds
+        self.spool_out_time_limit = 4.25  # seconds
+        self.spool_in_time_limit = 12  # seconds 
         self.object_moved = False  # used for edge case if object didn't move during trial
 
         # hall effect sensor for rotating table
@@ -77,8 +77,8 @@ class Testbed():
         gpio.output(self.turntable_motor_in1, gpio.LOW)
         # gpio.output(self.lower_arduino_reset_pin, gpio.HIGH)
         gpio.output(self.turntable_motor_in2, gpio.LOW)
-        self.turntable_pwm = gpio.PWM(self.turntable_motor_pwm, 1000)
-        self.turntable_pwm.start(50)
+        self.turntable_pwm = gpio.PWM(self.turntable_motor_pwm, 1023)
+        self.turntable_pwm.start(100)
 
         # , pull_up_down = gpio.PUD_DOWN)
         gpio.setup(self.hall_effect, gpio.IN)
@@ -145,7 +145,7 @@ class Testbed():
         return 1
     #----------------------------------------------------------------------------------------------------------------------------#
 
-    def cone_reset_up(self, time_duration=None):
+    def cone_reset_up(self, time_duration=None):        
         print("cone up")
         if time_duration == None:
             time_duration = self.lift_time_limit
@@ -172,6 +172,7 @@ class Testbed():
         if time_duration == None:
             time_duration = self.lower_time_limit
         self.reset_cone_motor.move_for(time_duration, self.reset_cone_motor.CCW)
+        
     
     #----------------------------------------------------------------------------------------------------------------------------#
 
@@ -185,34 +186,74 @@ class Testbed():
         self.reset_cone_motor.override_enable()
         start_time = time()
         spool_in_time = 0
+        # while True:
+        #     sleep(.01)
+        #     button_val = self.lower_slave.get_data()
+        #     if spool_in_time >= self.spool_in_time_limit or button_val == 1:
+        #         if button_val == 1:
+        #             print("button was pressed")
+        #         else:
+        #             print("time limit reached")
+        #         break
+        #     if buffer > 5:
+        #         self.object_moved = True
+        #     self.reset_cable_motor.move_for(
+        #         0.025, self.reset_cable_motor.CCW)  # check rotations
+        #     spool_in_time = time() - start_time
+        #     buffer += 1
+        # self.reset_cone_motor.override_disable()
+
+
+
+        self.reset_cable_motor.start_motor(self.reset_cable_motor.CCW)
         while True:
-            sleep(.01)
+            
             button_val = self.lower_slave.get_data()
+            if button_val == 1:
+                print("hi")
             if spool_in_time >= self.spool_in_time_limit or button_val == 1:
-                if button_val == 1:
-                    print("button was pressed")
-                else:
-                    print("time limit reached")
+                self.reset_cable_motor.stop_motor()
+                print("but")
                 break
-            if buffer > 5:
-                self.object_moved = True
-            self.reset_cable_motor.move_for(
-                0.025, self.reset_cable_motor.CCW)  # check rotations
             spool_in_time = time() - start_time
-            buffer += 1
-        self.reset_cone_motor.override_disable()
+            
+
+        # while True:
+        #     button_val = self.lower_slave.get_data()
+        #     if spool_in_time >= self.spool_in_time_limit or button_val == 1:
+        #         self.reset_cable_motor.stop_motor()
+        #         if button_val == 1:
+        #             print("button was pressed")
+        #         else:
+        #             print("time limit reached")
+        #         break
+        #     spool_in_time = time() - start_time
+        # self.reset_cone_motor.override_disable()
+
     #----------------------------------------------------------------------------------------------------------------------------#
 
     def cable_reset_spool_out(self, var):
         print("spool out")
         start_time = time()
         spool_out_time = 0
-        while self.object_moved:  # used as if statement as well
-            if spool_out_time >= var:
+        # while self.object_moved:  # used as if statement as well
+        #     if spool_out_time >= var:
+        #         break
+        #     self.reset_cable_motor.move_for(
+        #         0.1, self.reset_cable_motor.CW)  # check rotations
+        #     spool_out_time = time() - start_time
+        
+        self.reset_cable_motor.start_motor(self.reset_cable_motor.CW)
+        i = 0
+        while True:
+            # self.reset_cable_motor.print_child_pid(i)
+            if spool_out_time >= self.spool_out_time_limit:
+                self.reset_cable_motor.stop_motor()
+                print("but")
                 break
-            self.reset_cable_motor.move_for(
-                0.025, self.reset_cable_motor.CW)  # check rotations
             spool_out_time = time() - start_time
+            i += 1
+            
      #----------------------------------------------------------------------------------------------------------------------------#
 
     def turntable_reset_home(self):
@@ -381,14 +422,16 @@ What do you want to test? (enter the number)
 
     reset_testbed = Testbed()
     if test_num == 0:
-        reset_testbed.goal_angle = 30
-        for i in range(45):
+        reset_testbed.goal_angle = 360
+        for i in range(1):
             sleep(3)  # give me time to move object
             print("trial {}".format(i+1))
             reset_testbed.testbed_reset()
 
     elif test_num == 1:
+        reset_testbed.object_moved = True
         reset_testbed.cable_reset_spool_out(4.5)
+        
 
     elif test_num == 2:
         reset_testbed.cable_reset_spool_in()
@@ -404,6 +447,7 @@ What do you want to test? (enter the number)
 
     elif test_num == 6:
         angle = input("\nwhat angle do you want to rotate by?  (Degrees)\n")
+        
         reset_testbed.turntable_move_angle(angle)
 
     else:

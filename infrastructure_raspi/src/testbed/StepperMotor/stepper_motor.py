@@ -231,11 +231,12 @@ class StepperMotor:
     # kills motor process using SIGTERM UNIX signal.
     # use ps to see if child exited
     if not self.is_running():
-      raise Exception("No motor to kill")
+      raise Exception("No motor to kill")    
+    
     os.kill(self.__child_pid, signal.SIGTERM)
     self.__child_pid = -5
     gpio.output(self.en_pin, gpio.LOW)
-
+  
   def start_motor(self, direction, speed = None):
     """
     Starts motor in a given direction indefinitely. Non-blocking. 
@@ -261,8 +262,10 @@ class StepperMotor:
     except Exception as e:
       raise Exception("Motor pins not configured properly. Error: {}".format(e))
     self.__child_pid = os.fork()
+    
     if self.__child_pid == 0:
         # child process, run motor indefinitely
+      
       while True:
         gpio.output(self.pulse_pin, gpio.HIGH)
         sleep(speed)
