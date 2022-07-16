@@ -57,6 +57,11 @@ class StepperMotor:
   CCW = 1
   CW = 0
 
+  # setting a signal handler for current process for SIGUSR2 signal
+  # Can register in cp but would create theoretical race condition w/o ipc
+  def __handle_SIGUSR2(self, sig, frame):
+    os._exit(os.EX_OK)
+  
   def __init__(self, pulse_pin, dir_pin, en_pin, default_speed = None):
     """
     Constructor
@@ -93,6 +98,7 @@ class StepperMotor:
     # child PID retrieved from fork().
     # When no child process is running, value is -5
     self.__child_pid = -5
+    signal.signal(signal.SIGUSR2, self.__handle_SIGUSR2)
   
   def move_for(self, run_time, direction, speed = None):
     """
@@ -161,7 +167,7 @@ class StepperMotor:
           sleep(speed)
           gpio.output(self.pulse_pin, gpio.LOW)
           sleep(speed)
-        exit()
+        os._exit(os.EX_OK)
     else:
         # parent process, wait for child process to finish
         return_status = os.waitpid(self.__child_pid, 0)
@@ -228,12 +234,13 @@ class StepperMotor:
     -------
     None
     """
-    # kills motor process using SIGTERM UNIX signal.
+    # kills motor process using SIGUSR2 UNIX signal.
     # use ps to see if child exited
     if not self.is_running():
-      raise Exception("No motor to kill")    
-    
-    os.kill(self.__child_pid, signal.SIGTERM)
+
+      raise Exception("No motor to kill")
+    os.kill(self.__child_pid, signal.SIGUSR2)
+
     self.__child_pid = -5
     gpio.output(self.en_pin, gpio.LOW)
   
