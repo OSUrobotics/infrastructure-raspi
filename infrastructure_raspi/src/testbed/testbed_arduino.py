@@ -14,7 +14,7 @@ class Testbed():
         self.I2Cbus = smbus.SMBus(1)  # shared bus between slave devices
         self.lower_slave = lowerController(self.I2Cbus)
         # upper slave device
-        self.I2C_SLAVE2_ADDRESS = 14
+        self.I2C_SLAVE2_ADDRESS = 14  # 14 is 0x0E
 
         # Variables for moving cone up and down
         self.reset_cone_pul = 20  # pin
@@ -182,78 +182,25 @@ class Testbed():
         self.lower_slave.cone_button_mode()
         sleep(0.1)
         button_val = 0
-        buffer = 0
         self.reset_cone_motor.override_enable()
         start_time = time()
         spool_in_time = 0
-        # while True:
-        #     sleep(.01)
-        #     button_val = self.lower_slave.get_data()
-        #     if spool_in_time >= self.spool_in_time_limit or button_val == 1:
-        #         if button_val == 1:
-        #             print("button was pressed")
-        #         else:
-        #             print("time limit reached")
-        #         break
-        #     if buffer > 5:
-        #         self.object_moved = True
-        #     self.reset_cable_motor.move_for(
-        #         0.025, self.reset_cable_motor.CCW)  # check rotations
-        #     spool_in_time = time() - start_time
-        #     buffer += 1
-        # self.reset_cone_motor.override_disable()
-
-
-
         self.reset_cable_motor.start_motor(self.reset_cable_motor.CCW)
         while True:
-            
             button_val = self.lower_slave.get_data()
-            if button_val == 1:
-                print("hi")
             if spool_in_time >= self.spool_in_time_limit or button_val == 1:
                 self.reset_cable_motor.stop_motor()
-                print("but")
                 break
             spool_in_time = time() - start_time
             
-
-        # while True:
-        #     button_val = self.lower_slave.get_data()
-        #     if spool_in_time >= self.spool_in_time_limit or button_val == 1:
-        #         self.reset_cable_motor.stop_motor()
-        #         if button_val == 1:
-        #             print("button was pressed")
-        #         else:
-        #             print("time limit reached")
-        #         break
-        #     spool_in_time = time() - start_time
-        # self.reset_cone_motor.override_disable()
-
     #----------------------------------------------------------------------------------------------------------------------------#
 
-    def cable_reset_spool_out(self, var):
-        print("spool out")
-        start_time = time()
-        spool_out_time = 0
-        # while self.object_moved:  # used as if statement as well
-        #     if spool_out_time >= var:
-        #         break
-        #     self.reset_cable_motor.move_for(
-        #         0.1, self.reset_cable_motor.CW)  # check rotations
-        #     spool_out_time = time() - start_time
-        
-        self.reset_cable_motor.start_motor(self.reset_cable_motor.CW)
-        i = 0
-        while True:
-            # self.reset_cable_motor.print_child_pid(i)
-            if spool_out_time >= self.spool_out_time_limit:
-                self.reset_cable_motor.stop_motor()
-                print("but")
-                break
-            spool_out_time = time() - start_time
-            i += 1
+    def cable_reset_spool_out(self, time_duration=None):
+        if time_duration == None:
+            time_duration = self.spool_out_time_limit
+        self.reset_cable_motor.move_for(time_duration, self.reset_cable_motor.CW)
             
+
      #----------------------------------------------------------------------------------------------------------------------------#
 
     def turntable_reset_home(self):
