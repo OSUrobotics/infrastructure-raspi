@@ -14,8 +14,8 @@ if __name__ == "__main__":
     trial_time = int(raw_input("Trial Time (seconds, -1 to quit): "))
     if(trial_time == -1):
       break
-    tof_mode = int(raw_input("ToF mode (0 - 4): "))
-    resistance = float(raw_input("Friction Resistance (kg): "))
+    tof_mode = int(raw_input("ToF mode (0 - 4, Default is 0): "))
+    resistance = float(raw_input("Friction Resistance (0-1 kg): "))
 
     drawer.start_new_trial(resistance, tof_mode)
     timer = time() + trial_time
