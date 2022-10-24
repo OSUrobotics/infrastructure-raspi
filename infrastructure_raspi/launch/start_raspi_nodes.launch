@@ -1,3 +1,13 @@
 <launch>
+<<<<<<< HEAD
 <node pkg="infrastructure_raspi" name="testbed_controller" type="testbed_controller.py" output="screen"/>
+=======
+
+<!--
+launch hardware controller node here
+-->
+
+<node pkg="infrastructure_raspi" name="template_controller" type="template_controller.py" output="screen"/>
+
+>>>>>>> main
 </launch>
