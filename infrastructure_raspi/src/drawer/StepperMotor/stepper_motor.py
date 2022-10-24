@@ -29,6 +29,7 @@ class StepperMotor:
     GPIO pin number for enable pin of stepper motor controller
   default_speed : float
     delay between pulses in seconds / 2 (default .000001)
+    .000001 corresponds to DIP OFF/OFF/ON or similar 
   
   Methods
   -------
