@@ -1,17 +1,9 @@
-<<<<<<< HEAD
-# infrastructure-raspi Grasp Reset Mechanism (testbed)
-## Overview
-Contains hardware source code for the testbed and a ROS node for controlling the testbed within the infrastructure system.
-
-The [testbed_controller](https://github.com/OSUrobotics/infrastructure-raspi/blob/testbed/infrastructure_raspi/src/testbed_controller.py) node controls the hardware for the testbed.
-=======
 # infrastructure-raspi Template
 ## Overview
 Contains branches for each apparatus that includes the hardware source code, a ROS node for controlling the apparatus within the infrastructure system, and [urdf](https://github.com/OSUrobotics/infrastructure-raspi/tree/main/infrastructure_raspi/urdf) as well as [STL](https://github.com/OSUrobotics/infrastructure-raspi/tree/main/infrastructure_raspi/meshes) files for visualizing the apparatus (if applicable). 
 
 The _main_ branch contains a template of how to set up a branch for an apparatus (see [template_controller.py](https://github.com/OSUrobotics/infrastructure-raspi/blob/main/infrastructure_raspi/src/template_controller.py)). The [apparatus](https://github.com/OSUrobotics/infrastructure-raspi/tree/main/infrastructure_raspi/src/apparatus) folder should contain all of the hardware source code.
 
->>>>>>> main
 ## infrastructure_raspi Package Interface
 
 __Note:__ depending on how the controller node is set up for the apparatus, it may have additional publishers/subscribers. Be sure to look at the README.md in the specific apparatus branch.
