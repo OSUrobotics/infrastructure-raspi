@@ -23,13 +23,17 @@ class HardwareController():
 
     def __init__(self, hardware):
         #action servers
+        print("start")
         self.hardware = hardware
         self.parameters_as = actionlib.SimpleActionServer("set_test_parameters", TestParametersAction, self.parameter_callback, False) 
         self.parameters_as.start()
+        print("start1")
         self.reset_as = actionlib.SimpleActionServer("reset_hardware", StageAction, self.reset_callback, False) 
         self.reset_as.start()
+        print("start2")
 
     def parameter_callback(self, goal):
+        print("start3")
         trial_object = goal.parameters[0]
         reset_angle = goal.parameters[1]
         

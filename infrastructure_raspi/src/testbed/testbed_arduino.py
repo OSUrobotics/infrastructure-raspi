@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from time import time, sleep
+import struct
 import RPi.GPIO as gpio
 from StepperMotor.stepper_motor import StepperMotor
 from lower_i2c_controller import lowerController
@@ -15,6 +16,7 @@ class Testbed():
         self.lower_slave = lowerController(self.I2Cbus)
         # upper slave device
         self.I2C_SLAVE2_ADDRESS = 14  # 14 is 0x0E
+        self.upper_slave = 14  # 14 is 0x0E
 
         # Variables for moving cone up and down
         self.reset_cone_pul = 20  # pin
@@ -52,6 +54,8 @@ class Testbed():
         self.turntable_motor_in2 = 27  # pin
         self.turntable_motor_en = 13
         self.lower_arduino_reset_pin = 17
+
+        self.swap_time_limit = 110 # seconds
 
         # Variables for comunication with arduino for turntable encoder
 
@@ -206,7 +210,7 @@ class Testbed():
     def turntable_reset_home(self):
         print("resetting home")
         self.lower_slave.hall_effect_mode()
-        sleep(0.1)
+        sleep(0.2)
         hall_effect = self.lower_slave.get_data()
         if hall_effect == 0:
             # already within HE range. To ensure rotation ends at beginning of range, turn for set degrees > range
@@ -256,7 +260,7 @@ class Testbed():
     #     sleep(3)
     #----------------------------------------------------------------------------------------------------------------------------#
 
-    def object_swap(self, object_index):
+    def object_swap(self, firstObjectHeight = 46, firstObjectPos = 1, secondObjectHeight = 95, secondObjectPos = 2):
         # need to rewrite once working on upper reset
         # self.data_transfer(self.object_array[0])
         # return_value = 0
@@ -272,11 +276,6 @@ class Testbed():
         #     print(return_value)
         #     if return_value == 3:
         #         break
-
-        firstObjectHeight = 4366
-        firstObjectPos = 0  # destination for first object
-        secondObjectHeight = 2201
-        secondObjectPos = 1  # pickup for second object
 
         # firstObjectHeightBytes = firstObjectHeight.to_bytes(
         #     4, byteorder='little')
@@ -304,7 +303,42 @@ class Testbed():
         self.cone_reset_up()
         self.cable_reset_spool_in()
         self.cone_reset_up()
-        self.cable_reset_spool_out(.75)
+
+        firstObjectHeightBytes = list(bytearray(struct.pack('<L', firstObjectHeight)))
+        secondObjectHeightBytes = list(bytearray(struct.pack('<L', secondObjectHeight)))
+
+        print("firstObjectHeightBytes:", firstObjectHeightBytes)
+        print("secondObjectHeightBytes:", secondObjectHeightBytes)
+    
+        self.I2Cbus.write_i2c_block_data(self.upper_slave, 0x00, [
+            0xaa,
+            firstObjectHeightBytes[0], firstObjectHeightBytes[1], firstObjectHeightBytes[2], firstObjectHeightBytes[3],
+            firstObjectPos,
+            secondObjectHeightBytes[0], secondObjectHeightBytes[1], secondObjectHeightBytes[2], secondObjectHeightBytes[3],
+            secondObjectPos,
+            0xff
+        ])
+        """
+        msg = smbus.i2c_msg.read(self.upper_slave, 2) 
+        self.I2Cbus.i2c_rdwr(msg)
+        raw_list = list(msg)
+        val = (raw_list[0] << 8) + raw_list[1]
+        """
+        start_time = time()
+        swap_time = 0
+        while True:
+            sleep(1)
+            msg = self.I2Cbus.read_byte_data(self.upper_slave, 0)
+            #print("Data:", hex(msg))
+            if(msg == 0xF0):
+                # Upper arduino sends 0xF0 once complete
+                print("Swap Complete")
+                break
+            elif swap_time > self.swap_time_limit:
+                print("Swap/communication failure")
+                break
+            swap_time = time() - start_time
+           
 
         # self.send_transmission(4, self.I2C_SLAVE2_ADDRESS)
         # return_value = self.read_transmission(self.I2C_SLAVE2_ADDRESS)
@@ -318,9 +352,8 @@ class Testbed():
         #     if return_value == 5:
         #         break
 
-        self.cable_reset_spool_in()
+        self.cable_reset_spool_out()
         self.cone_reset_down()
-        self.cable_reset_spool_out(self.spool_out_time_limit)
         self.turntable_reset_home()
 #----------------------------------------------------------------------------------------------------------------------------#
 
@@ -364,6 +397,7 @@ if __name__ == '__main__':
 4) cone_down
 5) turntable_home
 6) turntable_angle
+7) Object Swap
 What do you want to test? (enter the number)
 """)
 
@@ -396,6 +430,10 @@ What do you want to test? (enter the number)
         angle = input("\nwhat angle do you want to rotate by?  (Degrees)\n")
         
         reset_testbed.turntable_move_angle(angle)
+
+    elif test_num == 7:
+        # add function here
+        reset_testbed.object_swap()
 
     else:
         print("\nNot implemented\n")
