@@ -64,11 +64,8 @@ class Testbed():
         self.turntable_motor_en = 13
         self.lower_arduino_reset_pin = 17
 
-<<<<<<< Updated upstream
-=======
         self.swap_time_limit = 190 # seconds
 
->>>>>>> Stashed changes
         # Variables for comunication with arduino for turntable encoder
 
         # Setting up the pins
@@ -277,16 +274,12 @@ class Testbed():
     #     sleep(3)
     #----------------------------------------------------------------------------------------------------------------------------#
 
-<<<<<<< Updated upstream
-    def object_swap(self, object_index):
-=======
     def object_swap(self, firstObjectID, firstObjectPos, secondObjectID, secondObjectPos):
     #firstObjectHeight = 46, firstObjectPos = 1, secondObjectHeight = 95, secondObjectPos = 2):
         print("got to swap")
         firstObjectHeight = self.object_dict[int(firstObjectID)]
         secondObjectHeight = self.object_dict[int(secondObjectID)]
         print("got to swap2")
->>>>>>> Stashed changes
         # need to rewrite once working on upper reset
         # self.data_transfer(self.object_array[0])
         # return_value = 0
@@ -336,9 +329,6 @@ class Testbed():
         self.cone_reset_up()
         self.cable_reset_spool_in()
         self.cone_reset_up()
-<<<<<<< Updated upstream
-        self.cable_reset_spool_out(.75)
-=======
 
         firstObjectHeightBytes = list(bytearray(struct.pack('<L', firstObjectHeight)))
         secondObjectHeightBytes = list(bytearray(struct.pack('<L', secondObjectHeight)))
@@ -375,7 +365,6 @@ class Testbed():
                 break
             swap_time = time() - start_time
            
->>>>>>> Stashed changes
 
         # self.send_transmission(4, self.I2C_SLAVE2_ADDRESS)
         # return_value = self.read_transmission(self.I2C_SLAVE2_ADDRESS)
@@ -389,16 +378,9 @@ class Testbed():
         #     if return_value == 5:
         #         break
 
-<<<<<<< Updated upstream
-        self.cable_reset_spool_in()
-        self.cone_reset_down()
-        self.cable_reset_spool_out(self.spool_out_time_limit)
-        self.turntable_reset_home()
-=======
         #self.cable_reset_spool_out()
         #self.cone_reset_down()
         #self.turntable_reset_home()
->>>>>>> Stashed changes
 #----------------------------------------------------------------------------------------------------------------------------#
 
     def action_caller(self, object_index, object_position, goal_angle):
