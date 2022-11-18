@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from time import time, sleep
+import struct
 import RPi.GPIO as gpio
 from StepperMotor.stepper_motor import StepperMotor
 from lower_i2c_controller import lowerController
@@ -24,6 +25,7 @@ class Testbed():
         self.lower_slave = lowerController(self.I2Cbus)
         # upper slave device
         self.I2C_SLAVE2_ADDRESS = 14  # 14 is 0x0E
+        self.upper_slave = 14  # 14 is 0x0E
 
         # Variables for moving cone up and down
         self.reset_cone_pul = 20  # pin
@@ -224,7 +226,7 @@ class Testbed():
     def turntable_reset_home(self):
         print("resetting home")
         self.lower_slave.hall_effect_mode()
-        sleep(0.1)
+        sleep(0.2)
         hall_effect = self.lower_slave.get_data()
         if hall_effect == 0:
             # already within HE range. To ensure rotation ends at beginning of range, turn for set degrees > range
@@ -295,11 +297,6 @@ class Testbed():
         #     print(return_value)
         #     if return_value == 3:
         #         break
-
-        firstObjectHeight = 4366
-        firstObjectPos = 0  # destination for first object
-        secondObjectHeight = 2201
-        secondObjectPos = 1  # pickup for second object
 
         # firstObjectHeightBytes = firstObjectHeight.to_bytes(
         #     4, byteorder='little')
@@ -429,6 +426,7 @@ if __name__ == '__main__':
 4) cone_down
 5) turntable_home
 6) turntable_angle
+7) Object Swap
 What do you want to test? (enter the number)
 """)
 
@@ -461,6 +459,10 @@ What do you want to test? (enter the number)
         angle = input("\nwhat angle do you want to rotate by?  (Degrees)\n")
         
         reset_testbed.turntable_move_angle(angle)
+
+    elif test_num == 7:
+        # add function here
+        reset_testbed.object_swap()
 
     else:
         print("\nNot implemented\n")
