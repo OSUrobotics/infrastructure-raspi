@@ -31,19 +31,22 @@ class HardwareController():
 
     def parameter_callback(self, goal):
         trial_object = goal.parameters[0]
-        reset_angle = goal.parameters[1]
         
-        try:
-            print("set_test_parameters")
-            print("trial_object: " + str(trial_object))
-            print("reset_angle: " + str(reset_angle))            
-            self.parameters_as.publish_feedback(TestParametersFeedback(status="setting object to: {}".format(trial_object)))
-            #add testbed start trial call here
-            self.hardware.action_caller(trial_object, reset_angle)
-            self.parameters_as.set_succeeded(TestParametersResult(result=0), text="SUCCESS")
-        except Exception as e:
-            print("failed set_test_parameters: " + str(e))
-            self.parameters_as.set_aborted(TestParametersResult(result=100), text="FAILED")
+        reset_angle = goal.parameters[1]
+        object_position = goal.parameters[2] #NEW
+        
+        #try:
+        print("set_test_parameters")
+        print("trial_object: " + str(trial_object))
+        print("object_position: " + str(object_position))
+        print("reset_angle: " + str(reset_angle))            
+        self.parameters_as.publish_feedback(TestParametersFeedback(status="setting object to: {}".format(trial_object)))
+        #add testbed start trial call here
+        self.hardware.action_caller(trial_object, object_position, reset_angle)
+        self.parameters_as.set_succeeded(TestParametersResult(result=0), text="SUCCESS")
+        #except Exception as e:
+        #print("failed set_test_parameters: " + str(e))
+        #self.parameters_as.set_aborted(TestParametersResult(result=100), text="FAILED")
 
     def reset_callback(self, goal):
         try:

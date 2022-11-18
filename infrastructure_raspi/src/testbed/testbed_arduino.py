@@ -11,6 +11,15 @@ class Testbed():
 
     def __init__(self):
 
+        # Create dictionary to store object sizes
+        # Key is object number, value is height in mm
+        self.object_dict =	{
+            1: 95,
+            2: 95,
+            3: 46,
+            4: 95
+        }
+
         self.I2Cbus = smbus.SMBus(1)  # shared bus between slave devices
         self.lower_slave = lowerController(self.I2Cbus)
         # upper slave device
@@ -31,6 +40,8 @@ class Testbed():
 
         self.object_array = [[1, 0, 2, 3, 4], [18, 0, 37, 37, 37]]
         self.previous_object = -1
+        self.previous_object_position = 1
+        self.need_swap = False
 
         # Variables for spooling in/out the cable
         self.reset_cable_pul = 19  # pin Green wire
@@ -53,6 +64,11 @@ class Testbed():
         self.turntable_motor_en = 13
         self.lower_arduino_reset_pin = 17
 
+<<<<<<< Updated upstream
+=======
+        self.swap_time_limit = 190 # seconds
+
+>>>>>>> Stashed changes
         # Variables for comunication with arduino for turntable encoder
 
         # Setting up the pins
@@ -136,12 +152,16 @@ class Testbed():
     def testbed_reset(self):
         self.cone_reset_up()
         self.cable_reset_spool_in()
-        sleep(.25)
-        self.cable_reset_spool_out(self.spool_out_time_limit)
-        self.cone_reset_down()
-        self.turntable_reset_home()
-        if self.goal_angle:
-            self.turntable_move_angle(self.goal_angle)
+        sleep(.5)
+        if True:
+            print("ho")
+            self.cable_reset_spool_out(self.spool_out_time_limit)
+            self.cone_reset_down()
+            self.turntable_reset_home()
+            if self.goal_angle:
+                self.turntable_move_angle(self.goal_angle)
+            self.need_swap = False
+            
         return 1
     #----------------------------------------------------------------------------------------------------------------------------#
 
@@ -189,6 +209,7 @@ class Testbed():
         while True:
             button_val = self.lower_slave.get_data()
             if spool_in_time >= self.spool_in_time_limit or button_val == 1:
+                sleep(.01)
                 self.reset_cable_motor.stop_motor()
                 break
             spool_in_time = time() - start_time
@@ -256,7 +277,16 @@ class Testbed():
     #     sleep(3)
     #----------------------------------------------------------------------------------------------------------------------------#
 
+<<<<<<< Updated upstream
     def object_swap(self, object_index):
+=======
+    def object_swap(self, firstObjectID, firstObjectPos, secondObjectID, secondObjectPos):
+    #firstObjectHeight = 46, firstObjectPos = 1, secondObjectHeight = 95, secondObjectPos = 2):
+        print("got to swap")
+        firstObjectHeight = self.object_dict[int(firstObjectID)]
+        secondObjectHeight = self.object_dict[int(secondObjectID)]
+        print("got to swap2")
+>>>>>>> Stashed changes
         # need to rewrite once working on upper reset
         # self.data_transfer(self.object_array[0])
         # return_value = 0
@@ -299,12 +329,53 @@ class Testbed():
         # raw_list = list(msg)
         # val = (raw_list[0] << 8) + raw_list[1]
         # print(val)
+        #first_object_height = 
+        print("HERE IN TESTBED ARDUINO")
 
         print("Sending Lower Reset Code")
         self.cone_reset_up()
         self.cable_reset_spool_in()
         self.cone_reset_up()
+<<<<<<< Updated upstream
         self.cable_reset_spool_out(.75)
+=======
+
+        firstObjectHeightBytes = list(bytearray(struct.pack('<L', firstObjectHeight)))
+        secondObjectHeightBytes = list(bytearray(struct.pack('<L', secondObjectHeight)))
+
+        print("firstObjectHeightBytes:", firstObjectHeightBytes)
+        print("secondObjectHeightBytes:", secondObjectHeightBytes)
+    
+        self.I2Cbus.write_i2c_block_data(self.upper_slave, 0x00, [
+            0xaa,
+            firstObjectHeightBytes[0], firstObjectHeightBytes[1], firstObjectHeightBytes[2], firstObjectHeightBytes[3],
+            firstObjectPos,
+            secondObjectHeightBytes[0], secondObjectHeightBytes[1], secondObjectHeightBytes[2], secondObjectHeightBytes[3],
+            secondObjectPos,
+            0xff
+        ])
+        """
+        msg = smbus.i2c_msg.read(self.upper_slave, 2) 
+        self.I2Cbus.i2c_rdwr(msg)
+        raw_list = list(msg)
+        val = (raw_list[0] << 8) + raw_list[1]
+        """
+        start_time = time()
+        swap_time = 0
+        while True:
+            sleep(1)
+            msg = self.I2Cbus.read_byte_data(self.upper_slave, 0x00)
+            print("Data:", hex(msg))
+            if(msg == 0xF0):
+                # Upper arduino sends 0xF0 once complete
+                print("Swap Complete")
+                break
+            elif swap_time > self.swap_time_limit:
+                print("Swap/communication failure")
+                break
+            swap_time = time() - start_time
+           
+>>>>>>> Stashed changes
 
         # self.send_transmission(4, self.I2C_SLAVE2_ADDRESS)
         # return_value = self.read_transmission(self.I2C_SLAVE2_ADDRESS)
@@ -318,35 +389,47 @@ class Testbed():
         #     if return_value == 5:
         #         break
 
+<<<<<<< Updated upstream
         self.cable_reset_spool_in()
         self.cone_reset_down()
         self.cable_reset_spool_out(self.spool_out_time_limit)
         self.turntable_reset_home()
+=======
+        #self.cable_reset_spool_out()
+        #self.cone_reset_down()
+        #self.turntable_reset_home()
+>>>>>>> Stashed changes
 #----------------------------------------------------------------------------------------------------------------------------#
 
-    def action_caller(self, object_index, goal_angle):
+    def action_caller(self, object_index, object_position, goal_angle):
+        print("THERE IN TESTBED ARDUINO")
         if (self.previous_object == -1):
+            print("ahh")
             # first run of testbed (assuming desired object is already on testbed)
             self.goal_angle = goal_angle
             # self.testbed_reset()
             self.previous_object = object_index
+            self.previous_object_position = object_position
         elif not (object_index == self.previous_object):
             # swap objects
 
             # self.send_swap_data([0, object_index])
             # self.data_transfer(self.object_array[1])
-
+            self.need_swap=True
             print("Swapping objects:", object_index)
-            self.object_swap(object_index)            
+            #self.object_swap(object_index)
+            self.object_swap(self.previous_object, int(self.previous_object_position), object_index, int(object_position))            
 
             self.goal_angle = goal_angle
             self.previous_object = object_index
+            self.previous_object_position = object_position
 
             # temporarily comment out for testing without I2C device
             # if not (goal_angle == 0):
             #     self.turntable_move_angle(goal_angle)
         else:
             # same object
+            print("heck")
             self.goal_angle = goal_angle
             # self.testbed_reset()
         # print("\nfinished first call\n")
