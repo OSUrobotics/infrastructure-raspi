@@ -113,12 +113,16 @@ void setup()
   initAxis();
 
   // Uncomment this block to run repeated object swaps
-  /*
+ /*
   while (1) {
-      swapObjects(46, 1, 95, 2);
-      swapObjects(95, 2, 46, 1);
+      swapObjects(95, 1, 95, 2);
+      swapObjects(95, 2, 95, 1);
   }
   */
+  
+  
+  
+  
 
   // Uncomment this block to run repeated initialization trials
   /*
@@ -184,7 +188,7 @@ void swapObjects(int object1Height, int position1, int object2Height, int positi
     position2 = pos4;
   }
   
-  turn_On_Magnet_North();
+  //turn_On_Magnet_North();
 
   //////////////////////////////////////////////////////////////////////// pickUpObjectFromHome
   // initial positions
@@ -215,7 +219,7 @@ void swapObjects(int object1Height, int position1, int object2Height, int positi
   // move horizontal to position
   move_stepper(&Horizontal_Stepper, position1);
   // go down
-  move_stepper(&Vertical_Stepper, 3000 + object1Height);
+  move_stepper(&Vertical_Stepper, 2975 + object1Height);
   // turn off magnet
   turn_On_Magnet_South();
   // go up
@@ -227,7 +231,7 @@ void swapObjects(int object1Height, int position1, int object2Height, int positi
   move_stepper(&Horizontal_Stepper, position2);
   // go down
   turn_On_Magnet_North();
-  move_stepper(&Vertical_Stepper, 3000 + object2Height);
+  move_stepper(&Vertical_Stepper, 2975 + object2Height);
   // turn on magnet
   
   // go up
@@ -306,7 +310,7 @@ void turn_On_Magnet_North()
 }
 void turn_On_Magnet_South()
 {
-  analogWrite(magnetEN, 600);
+  analogWrite(magnetEN, 500);
   //digitalWrite(magnetEN, HIGH);
   digitalWrite(magnetIn1, LOW);
   digitalWrite(magnetIn2, HIGH);
@@ -326,6 +330,7 @@ void loop()
   if (swap) {    
     swapObjects(firstObjectHeight, firstObjectPos, secondObjectHeight, secondObjectPos);
     swap = false;
+    Serial.print("here");
   }
 }
 
@@ -382,8 +387,10 @@ void loop()
 void requestEvents() {
   if(!swap) {
     Wire.write(0xF0);
+    Serial.print("here2");
   } else {
     Wire.write(0);
+    Serial.print("here3");
   }
 }
 
