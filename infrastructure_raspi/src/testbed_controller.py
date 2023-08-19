@@ -34,6 +34,7 @@ class HardwareController():
 
     def parameter_callback(self, goal):
         print("start3")
+        print(goal.parameters)
         trial_object = goal.parameters[0]
         
         reset_angle = goal.parameters[1]

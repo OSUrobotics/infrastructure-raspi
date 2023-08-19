@@ -22,6 +22,7 @@ class Testbed():
         }
 
         self.I2Cbus = smbus.SMBus(1)  # shared bus between slave devices
+        sleep(1)
         self.lower_slave = lowerController(self.I2Cbus)
         # upper slave device
         self.I2C_SLAVE2_ADDRESS = 14  # 14 is 0x0E
@@ -54,6 +55,7 @@ class Testbed():
 
         self.spool_out_time_limit = 4.25  # seconds
         self.spool_in_time_limit = 12  # seconds 
+        self.spool_in_time_limit_fast = self.spool_out_time_limit -.5
         self.object_moved = False  # used for edge case if object didn't move during trial
 
         # hall effect sensor for rotating table
@@ -205,11 +207,23 @@ class Testbed():
         start_time = time()
         spool_in_time = 0
         self.reset_cable_motor.start_motor(self.reset_cable_motor.CCW)
+        fast = True
         while True:
             button_val = self.lower_slave.get_data()
+            if spool_in_time >= self.spool_in_time_limit_fast and fast:
+                self.reset_cable_motor.stop_motor()
+                self.reset_cable_motor.start_motor(self.reset_cable_motor.CCW, speed=.0003)
+                fast = False
             if spool_in_time >= self.spool_in_time_limit or button_val == 1:
                 sleep(.01)
                 self.reset_cable_motor.stop_motor()
+                if spool_in_time < self.spool_out_time_limit/2:
+                    # If super short spool in then we actually didn't spool in all the way. Wait for user input and continue
+                    status_num = input("Short spool in. Move object and 0 to continue, 1 to stop.")
+                    if status_num == 0:
+                        self.reset_cable_motor.start_motor(self.reset_cable_motor.CCW)
+                        start_time = time()
+                        continue
                 break
             spool_in_time = time() - start_time
             
@@ -351,8 +365,13 @@ class Testbed():
         swap_time = 0
         while True:
             sleep(1)
-            msg = self.I2Cbus.read_byte_data(self.upper_slave, 0x00)
-            print("Data:", hex(msg))
+            try:
+                msg = self.I2Cbus.read_byte_data(self.upper_slave, 0x00)
+                print("Data:", hex(msg))
+            except:
+                msg = 0x00
+                print("got a weird value, but gonna keep listening")
+                continue
             if(msg == 0xF0):
                 # Upper arduino sends 0xF0 once complete
                 print("Swap Complete")

@@ -131,14 +131,15 @@ class Testbed():  # this is a test
     def cable_reset_spool_in(self):
         start_time = time()
         spool_in_time = 0
+        self.reset_cable_motor.start_motor(self.reset_cable_motor.CCW, speed=self.reset_cable_speed*2)
         while True:
             pin_value = gpio.input(self.cone_button)
             if spool_in_time >= self.spool_in_time_limit or pin_value == gpio.HIGH:
                 if pin_value == gpio.HIGH:
                     print("button was pressed")
                 break
-                
-            self.reset_cable_motor.move_for(0.001, self.reset_cable_motor.CCW)  # check rotations
+                self.reset_cable_motor.stop_motor()    
+            #self.reset_cable_motor.move_for(0.001, self.reset_cable_motor.CCW)  # check rotations
             spool_in_time = time() - start_time
         
 
@@ -203,6 +204,7 @@ class Testbed():  # this is a test
 
     
 if __name__ == '__main__':
+    
 
     test_num = input("""
 0) full table reset
