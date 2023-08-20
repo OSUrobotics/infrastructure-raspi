@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 from time import time
 import spidev
@@ -27,12 +27,14 @@ class Drawer:
     self.reset_dir = 6 # pin 31
     self.reset_en = 13  # pin 33, (High to Enable / LOW to Disable)
     self.time_unwind = 2 #in seconds
-    self.reset_speed = .000001 # seconds
+    self.reset_speed = 0.0001 # seconds
     self.dis_buffer = 5 #buffer value for resetting drawer (in mm)
     self.fric_pul = 17 #pin 11
     self.fric_dir = 27 # pin 13
     self.fric_en = 22  # pin 15 (High to Enable / LOW to Disable)
-    self.fric_steps = .00032 #relation between friction to # of motor steps
+
+    # TODO: Fix this part
+    self.fric_steps = .000032 #relation between friction to # of motor steps
     self.fric_speed = .000001 #seconds
     self.fric_min_steps = 2500 #min steps it takes to get brake to touch drawer
     self.base_friction = 0.3 #minimum resistance drawer has (in kg)
@@ -48,13 +50,15 @@ class Drawer:
     self.reset_motor = StepperMotor(self.reset_pul, self.reset_dir, self.reset_en)
     self.fric_motor = StepperMotor(self.fric_pul, self.fric_dir, self.fric_en)
     self.__trial_data = []
+    return
   
   def __set_friction(self):
     self.fric_motor.step(self.__resistance_steps, self.fric_motor.CW)
     self.fric_motor.override_enable() #keep motor resistance on
+    return
   
-  def __reset_friction(self):
-    self.fric_motor.step(self.__resistance_steps, self.fric_motor.CCW)
+  def reset_friction(self):
+    return self.fric_motor.step(self.__resistance_steps, self.fric_motor.CCW)
     
   def __read_handle(self):
     data = [-1] * 14
@@ -76,6 +80,7 @@ class Drawer:
     self.start_pos = self.tof.get_distance()
     self.__set_friction()
     # self.__trial_data = [] #not need?
+    return
   
   def collect_data(self):
     data_point = DataPoint(self.tof.get_distance() - self.start_pos, self.__read_handle())
@@ -99,7 +104,3 @@ class Drawer:
     
   def get_trial_data(self):
     return self.__trial_data
-    
-  def __del__(self):
-    gpio.cleanup()
-    del self.__trial_data

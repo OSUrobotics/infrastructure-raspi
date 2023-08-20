@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 from time import time, sleep
 import RPi.GPIO as gpio
 import numpy as np
@@ -35,18 +35,7 @@ class StepperMotor:
   move_for(run_time, direction, speed = None):
     moves motor in a single direction for a given time
 
-  step(num_steps, direction, speed = None):
-    steps motor in a single direction for a given amount of steps
-
-  override_enable():
-    force enable motor
-
-  override_disable():
-    force disables motor
-
-  stop_motor():
-    stops motor
-  
+  step(num_steps, direction, speed = None):start_motor
   start_motor():
     starts motor in a given direction indefinitely
 
@@ -78,7 +67,7 @@ class StepperMotor:
     """
     
     if(default_speed == None):
-      default_speed = .000001
+      default_speed = 0.0001 #0.0001
     try:
       self.pulse_pin = int(pulse_pin)
       self.dir_pin = int(dir_pin)
@@ -116,7 +105,7 @@ class StepperMotor:
       direction for motor to move in. Highly suggest using CW and CCW
       class variables
     speed : float, optional
-      delay between pulses in seconds / 2 (default default_speed)
+      delay between pulses in seconds / 2 (default = self.default_speed)
       
     Returns
     -------
@@ -203,11 +192,11 @@ class StepperMotor:
     
     Parameters
     ----------
-    NONE
+      NONE
       
     Returns
     -------
-    None
+      None
     """
     
     try:
@@ -227,11 +216,11 @@ class StepperMotor:
     
     Parameters
     ----------
-    NONE
+      NONE
       
     Returns
     -------
-    None
+      None
     """
     # kills motor process using custom signal SIGUSR2 UNIX signal.
     if not self.is_running():
@@ -247,11 +236,11 @@ class StepperMotor:
     
     Parameters
     ----------
-    NONE
+      NONE
       
     Returns
     -------
-    None
+      None
     """
     # runs motor indefinitely. Non-blocking
     if self.is_running():
@@ -259,6 +248,7 @@ class StepperMotor:
         raise Exception("Motor already running. Call stop_motor() first")
     if(speed == None):
       speed = self.default_speed
+    
     try:
       gpio.output(self.dir_pin, direction)
       gpio.output(self.en_pin, gpio.HIGH)

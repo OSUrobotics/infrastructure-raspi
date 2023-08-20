@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 class DataPoint:
   def __init__(self, tof, handle): #, time):

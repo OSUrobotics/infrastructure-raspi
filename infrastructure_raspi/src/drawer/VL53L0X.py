@@ -119,3 +119,13 @@ class VL53L0X(object):
             return (budget.value + 1000)
         else:
             return 0
+
+
+if __name__ == "__main__":
+    sensor = VL53L0X()
+    x = 0
+    while x < 5 :
+        x = x + 1
+        
+        sensor.get_distance()
+
