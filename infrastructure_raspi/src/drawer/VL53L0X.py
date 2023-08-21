@@ -2,7 +2,8 @@
 
 # MIT License
 #
-# Copyright (c) 2017 John Bryan Moore
+# Copyright (c) 2017 John Bryan Moore:
+# https://github.com/grantramsay/VL53L0X_rasp_python/blob/master/python/VL53L0X.py
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +41,7 @@ i2cbus = smbus.SMBus(1)
 
 # i2c bus read callback
 def i2c_read(address, reg, data_p, length):
-    ret_val = 0;
+    ret_val = 0
     result = []
  
     try:
@@ -56,7 +57,7 @@ def i2c_read(address, reg, data_p, length):
 
 # i2c bus write callback
 def i2c_write(address, reg, data_p, length):
-    ret_val = 0;
+    ret_val = 0
     data = []
 
     for index in range(length):
@@ -82,6 +83,9 @@ write_func = WRITEFUNC(i2c_write)
 # pass i2c read and write function pointers to VL53L0X library
 tof_lib.VL53L0X_set_i2c(read_func, write_func)
 
+class Vl53l0xError(RuntimeError):
+    pass
+
 class VL53L0X(object):
     """VL53L0X ToF."""
 
@@ -94,6 +98,18 @@ class VL53L0X(object):
         self.TCA9548A_Address = TCA9548A_Addr
         self.my_object_number = VL53L0X.object_number
         VL53L0X.object_number += 1
+        self.i2cbus = i2cbus
+        return
+
+    # def open(self):
+    #     self._dev = tof_lib.initialise(self.device_address, self.TCA9548A_Device, self.TCA9548A_Address)
+    #     return
+    
+    # def close(self):
+    #     return
+    
+    # def _configure_i2c_library_functions(self):
+    #     return
 
     def start_ranging(self, mode = VL53L0X_GOOD_ACCURACY_MODE):
         """Start VL53L0X ToF Sensor Ranging"""
@@ -112,7 +128,7 @@ class VL53L0X(object):
     def get_timing(self):
         Dev = POINTER(c_void_p)
         Dev = tof_lib.getDev(self.my_object_number)
-        budget = c_uint(0)
+        budget = c_uint32(0)
         budget_p = pointer(budget)
         Status =  tof_lib.VL53L0X_GetMeasurementTimingBudgetMicroSeconds(Dev, budget_p)
         if (Status == 0):
@@ -124,8 +140,11 @@ class VL53L0X(object):
 if __name__ == "__main__":
     sensor = VL53L0X()
     x = 0
+    sensor.start_ranging(mode=0)
     while x < 5 :
         x = x + 1
         
         sensor.get_distance()
+
+    sensor.stop_ranging()
 

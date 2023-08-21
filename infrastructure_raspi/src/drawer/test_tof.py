@@ -11,7 +11,9 @@ import time
 
 def test_tof():
     tof = VL53L0X()
-    tof.start_ranging()
+    # tof.open()
+    # tof.get_timing()
+    tof.start_ranging(mode=0)
     start_time = time.time()
 
     while (time.time() - start_time) < 5:

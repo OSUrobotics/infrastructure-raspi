@@ -190,7 +190,7 @@ class StepperMotor:
     control motor movement. Enabling/disabling of motor is handled
     internally by move methods
     
-    Parameters
+    ParametersException
     ----------
       NONE
       
@@ -265,4 +265,5 @@ class StepperMotor:
     else:
       # parent process, wait no hang for child process so it becomes a zombie. 
       # (child should never return anyways)
+        #  Relevant: https://www.youtube.com/watch?v=JghkG4WydNk
       os.waitpid(self.__child_pid, os.WNOHANG)
