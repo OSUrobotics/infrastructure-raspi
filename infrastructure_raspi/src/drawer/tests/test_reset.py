@@ -9,6 +9,10 @@ Notes for running this file:
         1. Start with the drawer pulled out. Make sure that the line from the spool to the drawer is relatively taut.
         2. Run script.
 """
+import os, sys
+__here__ = os.path.abspath(os.path.dirname(__file__))
+parent_dir = __here__.strip("tests")
+sys.path.append(parent_dir)
 
 import RPi.GPIO as gpio
 from StepperMotor.stepper_motor import StepperMotor

@@ -10,7 +10,9 @@ from VL53L0X import VL53L0X
 import time
 
 def test_tof():
+    print("Starting TOF test...")
     tof = VL53L0X()
+    
     # tof.open()
     # tof.get_timing()
     tof.start_ranging(mode=0)
