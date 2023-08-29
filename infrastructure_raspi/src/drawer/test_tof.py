@@ -5,6 +5,10 @@ Author: Luke Strohbehn
 
 A simple testing of the time of flight sensor.
 """
+import os, sys
+__here__ = os.path.abspath(os.path.dirname(__file__))
+parent_dir = __here__.strip("tests")
+sys.path.append(parent_dir)
 
 from VL53L0X import VL53L0X
 import time
