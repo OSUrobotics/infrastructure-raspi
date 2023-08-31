@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-from time import time
+import time
 import spidev
 import RPi.GPIO as gpio
 import VL53L0X
