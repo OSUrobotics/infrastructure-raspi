@@ -54,6 +54,7 @@ class lowerController():
         raw_list = list(msg)
         val = (raw_list[0] << 8) + raw_list[1]
         return val
+        
     
     def limit_switch_mode(self):
         """

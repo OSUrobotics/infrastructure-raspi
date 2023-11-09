@@ -34,8 +34,8 @@ class Testbed():
         self.reset_cone_en = 12  # pin  (HIGH to Enable / LOW to Disable)
         self.reset_cone_speed = 0.00001  # default value
 
-        self.lift_time_limit = 6.0  # seconds
-        self.lower_time_limit = 2.0  # seconds
+        self.lift_time_limit = 1.0  # seconds
+        self.lower_time_limit = .5  # seconds
         self.goal_angle = 0
         self.angle_error = 1
         # contact plates on the cone - like a button
@@ -176,7 +176,16 @@ class Testbed():
         sleep(0.1)
         self.reset_cone_motor.start_motor(self.reset_cone_motor.CW)
         while True:
-            button = self.lower_slave.get_data()
+            try:
+                button = self.lower_slave.get_data()
+            except OSError as e:
+                self.reset_cone_motor.stop_motor()
+                print("I2C failed. Restart Arduino.")
+                print("Error:")
+                print(e)
+                userin = inut("1 to continue: ")
+                self.reset_cone_motor.start_motor(self.reset_cone_motor.CW)
+
             if lift_time >= self.lift_time_limit or button == 1:
                 self.reset_cone_motor.stop_motor()
                 if button == 1:
@@ -224,6 +233,8 @@ class Testbed():
                         self.reset_cable_motor.start_motor(self.reset_cable_motor.CCW)
                         start_time = time()
                         continue
+                if spool_in_time >= self.spool_in_time_limit:
+                    status_num = input('Exceeded time limit. Do you want to contiue? Enter "1"')
                 break
             spool_in_time = time() - start_time
             
@@ -451,9 +462,10 @@ What do you want to test? (enter the number)
 
     reset_testbed = Testbed()
     if test_num == 0:
-        reset_testbed.goal_angle = 360
-        for i in range(1):
-            sleep(3)  # give me time to move object
+        reset_testbed.goal_angle = 0
+        for i in range(200):
+            #0sleep(3)  # give me time to move object
+            user_in = raw_input()
             print("trial {}".format(i+1))
             reset_testbed.testbed_reset()
 
