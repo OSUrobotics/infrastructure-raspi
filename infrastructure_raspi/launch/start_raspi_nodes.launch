@@ -1,0 +1,3 @@
+<launch>
+<node pkg="infrastructure_raspi" name="drawer_controller" type="drawer_controller.py" output="screen"/>
+</launch>

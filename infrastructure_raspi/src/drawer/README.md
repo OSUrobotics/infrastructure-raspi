@@ -1,0 +1,2 @@
+# Launching Drawer Node
+roslaunch infrastructure_raspi start_raspi_nodes.launch
