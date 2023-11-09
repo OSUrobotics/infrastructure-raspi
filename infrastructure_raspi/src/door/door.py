@@ -17,8 +17,6 @@ class Door:
         print("Setting up angle sensor")
         self.angle_sensor = AS5047P(0,0,1000000)
         counter = 0
-
-
         print("Angle sensor setup")
         self.lower_adc = spidev.SpiDev()
         self.lower_adc.open(1, 1) #same bus, synchronous
