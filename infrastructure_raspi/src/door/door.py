@@ -14,7 +14,12 @@ from rotary_sensor import AS5047P
 class Door:
  
     def __init__(self):
+        print("Setting up angle sensor")
         self.angle_sensor = AS5047P(0,0,1000000)
+        counter = 0
+
+
+        print("Angle sensor setup")
         self.lower_adc = spidev.SpiDev()
         self.lower_adc.open(1, 1) #same bus, synchronous
         self.lower_adc.max_speed_hz = 1000000
@@ -30,7 +35,7 @@ class Door:
         self.reset_dc = 20 #speed of motor
         self.dis_buffer = 1 #buffer value for resetting drawer (in deg)
         #magnet controller
-        self.magnet_freq = 200 #not finalized
+        self.magnet_freq = 100 #not finalized
         self.magnet_dc = 0 #to initialize magnets off
         self.magnet_pin = 13
 
@@ -69,25 +74,42 @@ class Door:
             r = self.upper_adc.xfer2([1, 8 + chan << 4, 0])
             data[chan + 8] = int(((r[1] & 3) << 8) + r[2])
         return data
+    def read_handle(self):
+        data = [-1] * 14
+        #lower ADC
+        for chan in range(0,8):
+            r = self.lower_adc.xfer2([1, 8 + chan << 4, 0])
+            data[chan] = int(((r[1] & 3) << 8) + r[2])
+        #spidev automatically switches CS signals
+        #upper ADC
+        for chan in range(0,6):
+            r = self.upper_adc.xfer2([1, 8 + chan << 4, 0])
+            data[chan + 8] = int(((r[1] & 3) << 8) + r[2])
+        return data
   
-    def start_new_trial(self, resistance):
+    def start_new_trial(self, resistance, friction_on = True):
         self.__resistance_value = resistance
         self.start_pos = self.angle_sensor.get_angle()
-        self.__set_friction()
+        if friction_on:
+            self.__set_friction()
    
     def collect_data(self):
         data_point = DataPoint(self.start_pos - self.angle_sensor.get_angle(), self.__read_handle())
         return data_point
    
     def reset(self):
-        self.__reset_friction()
+        self.__resistance_value = 100
+        self.__set_friction()
+        
         did_move = False
         end_pos = self.start_pos - self.dis_buffer
         #self.reset_pwm.start(self.reset_dc)
         self.reset_pwm.ChangeDutyCycle(self.reset_dc)
+        print("Disabled magnets, now closing")
         gpio.output(self.in3, 0)
         gpio.output(self.in4, 1)
         while(True):
+            print(self.angle_sensor.get_angle(), end_pos)
             if(self.angle_sensor.get_angle() >= end_pos):
                 break
             did_move = True
@@ -98,7 +120,15 @@ class Door:
         gpio.output(self.in3, 0)
         gpio.output(self.in4, 0)
         self.reset_pwm.ChangeDutyCycle(0)
+        self.__reset_friction()
         #self.reset_pwm.stop()
      
     def __del__(self):
         gpio.cleanup()
+
+if __name__ == "__main__":
+    # FOR TESTING ONLY
+    door = Door()
+    data = door.read_handle()
+    print(data)
+    

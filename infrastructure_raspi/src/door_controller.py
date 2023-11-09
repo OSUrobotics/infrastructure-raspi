@@ -77,9 +77,9 @@ class HardwareController():
         try:
             self.parameters_as.publish_feedback(TestParametersFeedback(status="setting friction to: {} N".format(friction_setting)))
             self.hardware.start_new_trial(friction_setting)
-	    self.parameters_as.set_succeeded(TestParametersResult(result=0), text="SUCCESS")
+            self.parameters_as.set_succeeded(TestParametersResult(result=0), text="SUCCESS")
         except:
-	    self.parameters_as.set_aborted(TestParametersResult(result=100), text="FAILED")
+	        self.parameters_as.set_aborted(TestParametersResult(result=100), text="FAILED")
 
     def reset_callback(self, goal):
         try:

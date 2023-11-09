@@ -8,7 +8,7 @@ import RPi.GPIO as gpio
 import sys
     
 if __name__ == "__main__":
-    freq = 200 #talk w/ UML about frequency setting
+    freq = 100 #talk w/ UML about frequency setting
     pin = 13
     duty_cycle = float(sys.argv[1])
     gpio.setmode(gpio.BCM)

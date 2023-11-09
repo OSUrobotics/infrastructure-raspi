@@ -98,6 +98,7 @@ if __name__ == "__main__":
     test = AS5047P(0,0,1000000)
     print(test.get_diagnostics())
     print("CORDIC MAG: {}".format(test.get_CORDIC_mag()))
+    sleep(5)
     try:
         start_pos = test.get_angle()
         while(not test.error_flag):

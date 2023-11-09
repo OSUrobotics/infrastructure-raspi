@@ -12,13 +12,36 @@ if __name__ == "__main__":
     in4 = 5
     enB = 12
     freq = 100
-    duty_cycle = float(sys.argv[1])
-    gpio.setmode(gpio.BCM)
-    gpio.setup(in3, gpio.OUT)
-    gpio.setup(in4, gpio.OUT)
-    gpio.setup(enB, gpio.OUT)
-    gpio.output(in3, 0)
-    gpio.output(in4, 0)
+    
+    
+    
+    try:
+        duty_cycle = float(sys.argv[1])
+        gpio.setmode(gpio.BCM)
+        gpio.setup(in3, gpio.OUT)
+        gpio.setup(in4, gpio.OUT)
+        gpio.setup(enB, gpio.OUT)
+        reset_pwm = gpio.PWM(enB, freq)
+        reset_pwm.start(duty_cycle)
+        print("Dir 1")
+        #gpio.output(enB, 1)
+        gpio.output(in3, 0)
+        gpio.output(in4, 1)
+        sleep(1)
+        print("Dir 2")
+        gpio.output(in3, 1)
+        gpio.output(in4, 0)
+        #gpio.output(enB, 1)
+        sleep(1)
+        gpio.output(in3, 0)
+        gpio.output(in4, 0)
+        #gpio.output(enB, 0)
+    
+    except KeyboardInterrupt:
+        gpio.cleanup()
+    gpio.cleanup()
+    exit()
+    
     pwm_pin = gpio.PWM(enB, freq)
     print("starting at DC {}".format(duty_cycle))
     pwm_pin.start(duty_cycle)
