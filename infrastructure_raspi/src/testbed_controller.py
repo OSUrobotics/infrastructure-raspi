@@ -23,28 +23,20 @@ class HardwareController():
 
     def __init__(self, hardware):
         #action servers
-        print("start")
         self.hardware = hardware
         self.parameters_as = actionlib.SimpleActionServer("set_test_parameters", TestParametersAction, self.parameter_callback, False) 
         self.parameters_as.start()
-        print("start1")
         self.reset_as = actionlib.SimpleActionServer("reset_hardware", StageAction, self.reset_callback, False) 
         self.reset_as.start()
-        print("start2")
+        rospy.loginfo("Action servers up")
 
     def parameter_callback(self, goal):
-        print("start3")
-        print(goal.parameters)
+        
         trial_object = goal.parameters[0]
         
         reset_angle = goal.parameters[1]
-        object_position = goal.parameters[2] #NEW
-        
-        #try:
-        print("set_test_parameters")
-        print("trial_object: " + str(trial_object))
-        print("object_position: " + str(object_position))
-        print("reset_angle: " + str(reset_angle))            
+        object_position = goal.parameters[2] #NEW  
+        rospy.loginfo("Got trial params - object: %d, position: %d, angle: %d", trial_object, object_position, reset_angle)        
         self.parameters_as.publish_feedback(TestParametersFeedback(status="setting object to: {}".format(trial_object)))
         #add testbed start trial call here
         self.hardware.action_caller(trial_object, object_position, reset_angle)
@@ -55,12 +47,12 @@ class HardwareController():
 
     def reset_callback(self, goal):
         try:
-            print("reset_hardware")
+            rospy.loginfo("reset_hardware")
             self.reset_as.publish_feedback(StageFeedback(status="Resetting Drawer"))
             self.hardware.testbed_reset()
             self.reset_as.set_succeeded(StageResult(result=0), text="SUCCESS")
         except Exception as e:
-            print("failed reset_hardware: " + str(e))
+            rospy.logerror("failed reset_hardware: %s", str(e))
             self.reset_as.set_aborted(StageResult(result=100), text="FAILED")
 
     def cleanup_wrapper():

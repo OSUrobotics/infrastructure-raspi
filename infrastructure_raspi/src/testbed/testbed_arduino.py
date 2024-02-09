@@ -6,6 +6,7 @@ import RPi.GPIO as gpio
 from StepperMotor.stepper_motor import StepperMotor
 from lower_i2c_controller import lowerController
 import smbus2 as smbus
+import rospy
 
 
 class Testbed():
@@ -155,7 +156,6 @@ class Testbed():
         self.cable_reset_spool_in()
         sleep(.5)
         if True:
-            print("ho")
             self.cable_reset_spool_out(self.spool_out_time_limit)
             self.cone_reset_down()
             self.turntable_reset_home()
@@ -167,7 +167,7 @@ class Testbed():
     #----------------------------------------------------------------------------------------------------------------------------#
 
     def cone_reset_up(self, time_duration=None):        
-        print("cone up")
+        rospy.loginfo("Cone up")
         if time_duration == None:
             time_duration = self.lift_time_limit
         start_time = time()
@@ -198,7 +198,7 @@ class Testbed():
     #----------------------------------------------------------------------------------------------------------------------------#    
 
     def cone_reset_down(self, time_duration=None):
-        print("cone down")
+        rospy.loginfo("Cone down")
         if time_duration == None:
             time_duration = self.lower_time_limit
         self.reset_cone_motor.move_for(time_duration, self.reset_cone_motor.CCW)
@@ -207,7 +207,7 @@ class Testbed():
     #----------------------------------------------------------------------------------------------------------------------------#
 
     def cable_reset_spool_in(self):
-        print("spool in")
+        rospy.loginfo("Spooling in")
         self.object_moved = False
         self.lower_slave.cone_button_mode()
         sleep(0.1)
@@ -249,13 +249,13 @@ class Testbed():
      #----------------------------------------------------------------------------------------------------------------------------#
 
     def turntable_reset_home(self):
-        print("resetting home")
+        rospy.loginfo("Rotating home")
         self.lower_slave.hall_effect_mode()
         sleep(0.2)
         hall_effect = self.lower_slave.get_data()
         if hall_effect == 0:
             # already within HE range. To ensure rotation ends at beginning of range, turn for set degrees > range
-            print("Already within Home range, moving to guarantee front of range")
+            rospy.loginfo("Already within Home range, moving to guarantee front of range")
             gpio.output(self.turntable_motor_in1, gpio.LOW)
             gpio.output(self.turntable_motor_in2, gpio.HIGH)
             sleep(2.5)  # let turntable move for 2.5 seconds
@@ -268,13 +268,13 @@ class Testbed():
             if hall_effect == 0:
                 gpio.output(self.turntable_motor_in1, gpio.LOW)
                 gpio.output(self.turntable_motor_in2, gpio.LOW)
-                print("magnet detected")
+                rospy.loginfo("Magnet detected")
                 break
             sleep(0.01)
     #----------------------------------------------------------------------------------------------------------------------------#
 
     def turntable_move_angle(self, goal_angle=20):
-        print("moving to angle")
+        rospy.loginfo("moving to angle")
         gpio.output(self.turntable_motor_in1, gpio.LOW)
         gpio.output(self.turntable_motor_in2, gpio.HIGH)
         self.lower_slave.start_counting()
@@ -411,9 +411,7 @@ class Testbed():
 #----------------------------------------------------------------------------------------------------------------------------#
 
     def action_caller(self, object_index, object_position, goal_angle):
-        print("THERE IN TESTBED ARDUINO")
         if (self.previous_object == -1):
-            print("ahh")
             # first run of testbed (assuming desired object is already on testbed)
             self.goal_angle = goal_angle
             # self.testbed_reset()
