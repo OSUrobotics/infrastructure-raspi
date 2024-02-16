@@ -52,7 +52,7 @@ class HardwareController():
             self.hardware.testbed_reset()
             self.reset_as.set_succeeded(StageResult(result=0), text="SUCCESS")
         except Exception as e:
-            rospy.logerror("failed reset_hardware: %s", str(e))
+            rospy.logerr("failed reset_hardware: %s", str(e))
             self.reset_as.set_aborted(StageResult(result=100), text="FAILED")
 
     def cleanup_wrapper():

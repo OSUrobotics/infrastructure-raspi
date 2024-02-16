@@ -241,6 +241,14 @@ class Testbed():
     #----------------------------------------------------------------------------------------------------------------------------#
 
     def cable_reset_spool_out(self, time_duration=None):
+        rospy.loginfo("Spooling out")
+        # Spool slow for a second
+        start_time = time()
+        self.reset_cable_motor.start_motor(self.reset_cable_motor.CW, speed=.0003)
+        while time() - start_time < 2:
+            sleep(.01)
+        self.reset_cable_motor.stop_motor()
+            
         if time_duration == None:
             time_duration = self.spool_out_time_limit
         self.reset_cable_motor.move_for(time_duration, self.reset_cable_motor.CW)
