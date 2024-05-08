@@ -184,7 +184,7 @@ class Testbed():
                 print("I2C failed. Restart Arduino.")
                 print("Error:")
                 print(e)
-                userin = inut("1 to continue: ")
+                userin = input("1 to continue: ")
                 self.reset_cone_motor.start_motor(self.reset_cone_motor.CW)
 
             if lift_time >= self.lift_time_limit or button == 1:
