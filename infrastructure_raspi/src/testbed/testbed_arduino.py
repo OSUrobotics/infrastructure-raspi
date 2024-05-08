@@ -54,7 +54,7 @@ class Testbed():
         self.reset_cable_en = 5
         self.reset_cable_speed = 0.00001  # default value
 
-        self.spool_out_time_limit = 4.25  # seconds
+        self.spool_out_time_limit = 3.5 #4.25  # seconds
         self.spool_in_time_limit = 12  # seconds 
         self.spool_in_time_limit_fast = self.spool_out_time_limit -.5
         self.object_moved = False  # used for edge case if object didn't move during trial
@@ -161,6 +161,7 @@ class Testbed():
             self.turntable_reset_home()
             if self.goal_angle:
                 self.turntable_move_angle(self.goal_angle)
+            
             self.need_swap = False
             
         return 1
