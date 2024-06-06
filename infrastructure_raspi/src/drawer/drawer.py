@@ -35,7 +35,7 @@ class Drawer:
         self.reset_dir = 6 # pin 31
         self.reset_en = 13    # pin 33, (High to Enable / LOW to Disable)
         self.reset_unwind_time = 1.5 # in seconds
-        self.reset_speed = 0.0001 # seconds
+        self.reset_speed = 0.001 # seconds
         self.dis_buffer = 5 #buffer value for resetting drawer (in mm)
         self.fric_pul = 17 #pin 11
         self.fric_dir = 27 # pin 13

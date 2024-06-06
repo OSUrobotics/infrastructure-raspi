@@ -38,6 +38,7 @@ class HardwareController():
         self.rate = rospy.Rate(35)
         self.collect_data = False
         self.is_set = False
+        rospy.loginfo("Action servers up!")
 
         # self.timer = rospy.Timer(rospy.Duration(1/35), self.data_collection_callback)
 
@@ -77,6 +78,7 @@ class HardwareController():
 
 
     def parameter_callback(self, goal):
+        rospy.loginfo("Setting parameters")
         friction_setting = goal.parameters[0]
         try:
             self.parameters_as.publish_feedback(TestParametersFeedback(status="setting friction to: {} N".format(friction_setting)))
